@@ -137,7 +137,7 @@
             const messageElement = document.getElementById('alert-message');
 
             messageElement.innerHTML = `
-                Critical wind speeds exceeding 14 knots have been detected at the following location(s):
+                Critical wind speeds exceeding 10 knots have been detected at the following location(s):
                 <strong class="text-red-300 block mt-2 text-xl">${list}</strong>
                 <span class="block mt-2">It is highly dangerous to sail now. Please verify current conditions before departure.</span>
             `;
@@ -462,7 +462,7 @@
                     renderedCards.push(createErrorCardHtml(result.name, result.message));
                 } else {
                     // Result is successful data object: check danger condition, then render HTML
-                    if (parseFloat(result.windKnots) > 14) {
+                    if (parseFloat(result.windKnots) > 10) {
                         isGlobalDanger = true;
                         dangerMarinas.push(result.name); // Collect the name of the dangerous marina
                     }
