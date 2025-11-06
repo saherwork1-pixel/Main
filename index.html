@@ -69,17 +69,21 @@
         .animate-fast-pulse {
             animation: fast-pulse 0.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-        
+
         /* --- Custom styles for the Border flashing --- */
         @keyframes border-pulse {
             0% {
-                border-color: rgba(239, 68, 68, 0.4); /* Faded Red */
+                border-color: rgba(239, 68, 68, 0.4);
+                /* Faded Red */
                 box-shadow: 0 0 5px rgba(239, 68, 68, 0.3);
             }
+
             50% {
-                border-color: rgba(255, 0, 0, 1); /* Bright Red */
+                border-color: rgba(255, 0, 0, 1);
+                /* Bright Red */
                 box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
             }
+
             100% {
                 border-color: rgba(239, 68, 68, 0.4);
                 box-shadow: 0 0 5px rgba(239, 68, 68, 0.3);
@@ -90,7 +94,6 @@
             animation: border-pulse 1.5s infinite ease-in-out;
         }
         /* End of new border pulse styles */
-
     </style>
 </head>
 
@@ -104,17 +107,51 @@
 
     <main class="relative z-10 w-full max-w-7xl flex flex-col items-center">
 
-        <div id="uae-clock"
-            class="text-center mb-10 p-4 sm:p-6 rounded-xl shadow-2xl border border-sky-800 w-full max-w-xl mx-auto frosted-panel">
-        </div>
-
-        <h1 class="text-4xl font-extrabold text-sky-300 mb-12 border-b-2 border-sky-500/50 pb-2">
+        <h1 class="text-4xl font-extrabold text-sky-300 mb-8 border-b-2 border-sky-500/50 pb-2">
             Abu Dhabi Marina Weather & Location Tracker
         </h1>
 
-        <div id="cards-container"
-            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[repeat(3,minmax(0,1fr))] gap-10 max-w-7xl w-full mb-12">
+        <!-- NEW FLEX CONTAINER: Layout for Clock, Cards (3/4 width) and Alerts (1/4 width) -->
+        <div class="w-full max-w-7xl flex flex-col lg:flex-row lg:space-x-8 mb-12">
+
+            <!-- LEFT COLUMN: Clock and Weather Cards (3/4 width on large screens) -->
+            <div class="lg:w-3/4 w-full">
+
+                <!-- Clock Panel -->
+                <div id="uae-clock"
+                    class="text-center mb-8 p-4 sm:p-6 rounded-xl shadow-2xl border border-sky-800 w-full mx-auto frosted-panel">
+                </div>
+
+                <!-- Weather Cards Container -->
+                <div id="cards-container"
+                    class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 w-full">
+                    <!-- Cards will be injected here -->
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Live Alerts Panel (1/4 width on large screens) -->
+            <div class="lg:w-1/4 w-full mt-8 lg:mt-0">
+                <div id="live-alerts-panel"
+                    class="frosted-panel p-4 rounded-xl shadow-2xl border border-red-800 lg:sticky lg:top-8">
+                    <h3 class="text-xl font-bold text-red-400 border-b pb-2 mb-4 border-red-900 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-red-500 animate-fast-pulse" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.394 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
+                        Live Sailing Alerts
+                    </h3>
+                    <p class="text-gray-400 text-sm mb-4" id="alerts-status">
+                        <!-- Alert status message injected here -->
+                    </p>
+                    <div id="danger-alerts-list" class="space-y-3">
+                        <!-- Danger alerts will be injected here -->
+                    </div>
+                </div>
+            </div>
         </div>
+        <!-- END NEW FLEX CONTAINER -->
 
         <h2 class="text-3xl font-bold text-gray-200 mb-6 mt-6">Marina Location Map</h2>
         <div class="w-full max-w-7xl rounded-xl overflow-hidden shadow-2xl border-4 border-sky-900/50 frosted-panel">
@@ -125,49 +162,10 @@
             </iframe>
         </div>
     </main>
-
-    <div id="danger-modal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-70 items-center justify-center">
-        <div
-            class="frosted-panel p-8 rounded-xl shadow-2xl max-w-lg w-full border-4 border-red-600 transform transition-all duration-300 scale-100">
-            <div class="text-center">
-                <svg class="mx-auto h-16 w-16 text-red-500 animate-fast-pulse" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.394 16c-.77 1.333.192 3 1.732 3z">
-                    </path>
-                </svg>
-                <h3 class="mt-4 text-3xl font-extrabold text-red-400">DANGER ALERT</h3>
-                <p id="alert-message" class="mt-2 text-lg text-gray-300 font-medium">
-                    Critical wind speeds exceeding 14 knots detected. It is highly dangerous to sail now.
-                </p>
-                <button onclick="hideDangerAlert()"
-                    class="mt-6 w-full rounded-lg bg-red-600 text-white p-3 font-bold hover:bg-red-700 transition duration-50 shadow-lg">
-                    Acknowledge and Check Conditions
-                </button>
-            </div>
-        </div>
-    </div>
+    
+    <!-- DANGER MODAL REMOVED -->
 
     <script>
-        // --- MODAL CONTROL FUNCTIONS ---
-        function displayDangerAlert(marinas) {
-            const list = marinas.join(', ');
-            const messageElement = document.getElementById('alert-message');
-
-            messageElement.innerHTML = `
-                Critical wind speeds exceeding 14 knots have been detected at the following location(s):
-                <strong class="text-red-300 block mt-2 text-xl">${list}</strong>
-                <span class="block mt-2">It is highly dangerous to sail now. Please verify current conditions before departure.</span>
-            `;
-            document.getElementById('danger-modal').style.display = 'flex';
-        }
-
-        function hideDangerAlert() {
-            document.getElementById('danger-modal').style.display = 'none';
-        }
-        // Expose to global scope for button onclick
-        window.hideDangerAlert = hideDangerAlert;
-
         // --- UTILITY FUNCTION: Exponential Backoff for API Calls ---
         async function exponentialBackoffFetch(url, maxRetries = 5) {
             for (let i = 0; i < maxRetries; i++) {
@@ -196,8 +194,16 @@
             const now = new Date();
 
             // Format time components
-            const dayName = now.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'Asia/Dubai' });
-            const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'Asia/Dubai' });
+            const dayName = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                timeZone: 'Asia/Dubai'
+            });
+            const dateStr = now.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                timeZone: 'Asia/Dubai'
+            });
             // Show hours, minutes, and seconds
             const timeStr = now.toLocaleTimeString('en-US', {
                 hour: '2-digit',
@@ -249,7 +255,9 @@
 
                     if (!dailyData[dateKey]) {
                         dailyData[dateKey] = {
-                            day: date.toLocaleDateString('en-US', { weekday: 'short' }),
+                            day: date.toLocaleDateString('en-US', {
+                                weekday: 'short'
+                            }),
                             temps: [],
                             winds: [],
                             icons: []
@@ -305,11 +313,31 @@
 
         // Define multiple locations by their precise Latitude and Longitude.
         const locations = [
-            { name: "Royal M Marina", lat: 24.447700, lon: 54.337994 },
-            { name: "Yas Island Marina", lat: 24.467729, lon: 54.609596 },
-            { name: "Saadiyat Island Marina", lat: 24.560394, lon: 54.459160 },
-            { name: "Qasr Al-Emarat Marina", lat: 24.4839, lon: 54.6033 },
-            { name: "Al-Dar Marina", lat: 24.453231, lon: 54.338079 },
+            {
+                name: "Royal M Marina",
+                lat: 24.447700,
+                lon: 54.337994
+            },
+            {
+                name: "Yas Island Marina",
+                lat: 24.467729,
+                lon: 54.609596
+            },
+            {
+                name: "Saadiyat Island Marina",
+                lat: 24.560394,
+                lon: 54.459160
+            },
+            {
+                name: "Qasr Al-Emarat Marina",
+                lat: 24.4839,
+                lon: 54.6033
+            },
+            {
+                name: "Al-Dar Marina",
+                lat: 24.453231,
+                lon: 54.338079
+            },
         ];
 
         const container = document.getElementById("cards-container");
@@ -331,15 +359,25 @@
 
         // Function to create the HTML string for a single weather card
         function createCardHtml(locationData) {
-            const { name, temp, desc, icon, windKmh, windKnots, humidity, forecast } = locationData;
+            const {
+                name,
+                temp,
+                desc,
+                icon,
+                windKmh,
+                windKnots,
+                humidity,
+                forecast
+            } = locationData;
 
             // Warning Condition: 11 knots or more triggers the flashing border
             const isWarning = parseFloat(windKnots) >= 11;
 
             const warningBadge = isWarning
                 // Badge animation is kept to flash the DANGER text itself
-                ? '<span class="ml-3 text-xs sm:text-sm inline-flex items-center rounded-full bg-red-800 px-3 py-1 font-medium text-red-300 shadow-md animate-fast-pulse">DANGER!</span>'
-                : '';
+                ?
+                '<span class="ml-3 text-xs sm:text-sm inline-flex items-center rounded-full bg-red-800 px-3 py-1 font-medium text-red-300 shadow-md animate-fast-pulse">DANGER!</span>' :
+                '';
 
             // Apply the custom border-pulse animation class when warning is active
             const borderColor = isWarning ? 'border-red-600 animate-border-pulse' : 'border-sky-800';
@@ -428,7 +466,11 @@
         // Fetches data for a single location and returns the processed data object (no HTML)
         async function getWeather(location) {
             if (apiKey.length < 5) {
-                return { error: true, name: location.name, message: "API Key is missing or invalid." };
+                return {
+                    error: true,
+                    name: location.name,
+                    message: "API Key is missing or invalid."
+                };
             }
 
             // 1. Current Weather API Call (For real-time data)
@@ -448,7 +490,11 @@
 
                 if (currentResponse.status !== 200 || forecastResponse.status !== 200) {
                     console.error(`API Error for ${location.name}. Current Status: ${currentResponse.status}. Forecast Status: ${forecastResponse.status}`);
-                    return { error: true, name: location.name, message: `API error (status: ${currentResponse.status}/${forecastResponse.status}).` };
+                    return {
+                        error: true,
+                        name: location.name,
+                        message: `API error (status: ${currentResponse.status}/${forecastResponse.status}).`
+                    };
                 }
 
                 // 1. Process Current Data
@@ -472,7 +518,11 @@
                 };
             } catch (error) {
                 console.error(`Fetch failed for ${location.name}:`, error);
-                return { error: true, name: location.name, message: "Network or API service failed after retries." };
+                return {
+                    error: true,
+                    name: location.name,
+                    message: "Network or API service failed after retries."
+                };
             }
         }
 
@@ -485,7 +535,6 @@
             const cardPromises = locations.map(location => getWeather(location));
             const cardDataResults = await Promise.all(cardPromises);
 
-            let isGlobalDanger = false;
             const dangerMarinas = []; // Array to collect names of marinas in danger (where wind >= 14 knots)
             const renderedCards = [];
 
@@ -494,12 +543,12 @@
                     // Result is an error object: render error HTML
                     renderedCards.push(createErrorCardHtml(result.name, result.message));
                 } else {
-                    // Result is successful data object: check danger condition, then render HTML
-                    
-                    // NOTE: The modal triggers for 14+ knots. The border flashes for 11+ knots (inside createCardHtml).
+                    // Check danger condition (>= 14 knots)
                     if (parseFloat(result.windKnots) >= 14) {
-                        isGlobalDanger = true;
-                        dangerMarinas.push(result.name); // Collect the name of the dangerous marina
+                        dangerMarinas.push({
+                            name: result.name,
+                            wind: result.windKnots
+                        });
                     }
                     renderedCards.push(createCardHtml(result));
                 }
@@ -508,9 +557,31 @@
             // 2. Inject all the generated HTML cards, replacing the loading message
             container.innerHTML = renderedCards.join('');
 
-            // 3. Display the global alert if the flag was set
-            if (isGlobalDanger) {
-                displayDangerAlert(dangerMarinas); // Pass the list of dangerous marinas
+            // 3. Update the static alerts section
+            const alertsListElement = document.getElementById('danger-alerts-list');
+            const alertsStatusElement = document.getElementById('alerts-status');
+
+            if (dangerMarinas.length > 0) {
+                alertsStatusElement.innerHTML = `
+                    <span class="text-red-300 font-semibold">
+                        ${dangerMarinas.length} critical wind alert(s) detected. DO NOT SAIL!
+                    </span>
+                `;
+                // Generate individual alert items for the list
+                alertsListElement.innerHTML = dangerMarinas.map(d => `
+                    <div class="p-3 bg-red-900/40 rounded-lg border border-red-700 animate-border-pulse transition duration-300 hover:bg-red-800/50">
+                        <p class="text-lg font-bold text-red-300">${d.name}</p>
+                        <p class="text-sm text-red-400">Wind Speed: ${d.wind} knots</p>
+                    </div>
+                `).join('');
+            } else {
+                alertsStatusElement.textContent = "No immediate danger alerts (≥ 14 knots). Conditions are currently safe for sailing.";
+                alertsListElement.innerHTML = `
+                     <div class="p-3 bg-sky-900/40 rounded-lg border border-sky-700 text-center">
+                         <p class="text-md font-semibold text-sky-300">All Clear</p>
+                         <p class="text-sm text-gray-400">Continue monitoring for changes.</p>
+                     </div>
+                `;
             }
         }
 
