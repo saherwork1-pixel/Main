@@ -21,11 +21,11 @@
             position: fixed;
             right: 0;
             bottom: 0;
-            min-width: 0%;
-            min-height: 0%;
+            min-width: 100%;
+            min-height: 100%;
             width: auto;
             height: auto;
-            z-index: -0;
+            z-index: -100;
             /* Place it far behind all content */
             filter: brightness(50%);
             /* Darken video slightly for better text contrast */
@@ -35,9 +35,9 @@
         .frosted-panel {
             background-color: rgba(15, 23, 42, 0.7);
             /* Slightly translucent dark background */
-            backdrop-filter: blur(px);
+            backdrop-filter: blur(10px);
             /* The crucial blurring effect */
-            -webkit-backdrop-filter: blur(px);
+            -webkit-backdrop-filter: blur(10px);
             /* Safari support */
         }
 
@@ -58,7 +58,7 @@
         @keyframes fast-pulse {
 
             0%,
-            0% {
+            100% {
                 opacity: 1;
             }
 
@@ -84,10 +84,10 @@
         Your browser does not support the video tag.
     </video>
 
-    <main class="relative z- w-full max-w-7xl flex flex-col items-center">
+    <main class="relative z-10 w-full max-w-7xl flex flex-col items-center">
 
         <div id="uae-clock"
-            class="text-center mb- p-4 sm:p-6 rounded-xl shadow-2xl border border-sky-800 w-full max-w-xl mx-auto frosted-panel">
+            class="text-center mb-10 p-4 sm:p-6 rounded-xl shadow-2xl border border-sky-800 w-full max-w-xl mx-auto frosted-panel">
             </div>
 
         <h1 class="text-4xl font-extrabold text-sky-300 mb-12 border-b-2 border-sky-500/50 pb-2">
@@ -95,7 +95,7 @@
         </h1>
 
         <div id="cards-container"
-            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[repeat(3,minmax(0,1fr))] gap- max-w-7xl w-full mb-12">
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[repeat(3,minmax(0,1fr))] gap-10 max-w-7xl w-full mb-12">
             </div>
 
         <h2 class="text-3xl font-bold text-gray-200 mb-6 mt-6">Marina Location Map</h2>
