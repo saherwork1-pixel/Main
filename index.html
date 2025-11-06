@@ -54,9 +54,8 @@
             box-shadow: 0 12px 25px rgba(0, 0, 0, 0.6);
         }
 
-        /* --- Custom styles for faster flashing --- */
+        /* --- Custom styles for faster flashing (for the DANGER text) --- */
         @keyframes fast-pulse {
-
             0%,
             100% {
                 opacity: 1;
@@ -65,14 +64,33 @@
             50% {
                 opacity: 0.2;
             }
-
-            /* Making it dimmer for a stronger flash effect */
         }
 
         .animate-fast-pulse {
             animation: fast-pulse 0.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-            /* 0.5 seconds for a very quick flash */
         }
+        
+        /* --- Custom styles for the Border flashing --- */
+        @keyframes border-pulse {
+            0% {
+                border-color: rgba(239, 68, 68, 0.4); /* Faded Red */
+                box-shadow: 0 0 5px rgba(239, 68, 68, 0.3);
+            }
+            50% {
+                border-color: rgba(255, 0, 0, 1); /* Bright Red */
+                box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+            }
+            100% {
+                border-color: rgba(239, 68, 68, 0.4);
+                box-shadow: 0 0 5px rgba(239, 68, 68, 0.3);
+            }
+        }
+
+        .animate-border-pulse {
+            animation: border-pulse 1.5s infinite ease-in-out;
+        }
+        /* End of new border pulse styles */
+
     </style>
 </head>
 
@@ -88,7 +106,7 @@
 
         <div id="uae-clock"
             class="text-center mb-10 p-4 sm:p-6 rounded-xl shadow-2xl border border-sky-800 w-full max-w-xl mx-auto frosted-panel">
-            </div>
+        </div>
 
         <h1 class="text-4xl font-extrabold text-sky-300 mb-12 border-b-2 border-sky-500/50 pb-2">
             Abu Dhabi Marina Weather & Location Tracker
@@ -96,7 +114,7 @@
 
         <div id="cards-container"
             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[repeat(3,minmax(0,1fr))] gap-10 max-w-7xl w-full mb-12">
-            </div>
+        </div>
 
         <h2 class="text-3xl font-bold text-gray-200 mb-6 mt-6">Marina Location Map</h2>
         <div class="w-full max-w-7xl rounded-xl overflow-hidden shadow-2xl border-4 border-sky-900/50 frosted-panel">
@@ -106,7 +124,7 @@
                 referrerpolicy="no-referrer-when-downgrade">
             </iframe>
         </div>
-        </main>
+    </main>
 
     <div id="danger-modal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-70 items-center justify-center">
         <div
@@ -120,7 +138,7 @@
                 </svg>
                 <h3 class="mt-4 text-3xl font-extrabold text-red-400">DANGER ALERT</h3>
                 <p id="alert-message" class="mt-2 text-lg text-gray-300 font-medium">
-                    Critical wind speeds exceeding 10 knots detected. It is highly dangerous to sail now.
+                    Critical wind speeds exceeding 14 knots detected. It is highly dangerous to sail now.
                 </p>
                 <button onclick="hideDangerAlert()"
                     class="mt-6 w-full rounded-lg bg-red-600 text-white p-3 font-bold hover:bg-red-700 transition duration-50 shadow-lg">
@@ -315,50 +333,62 @@
         function createCardHtml(locationData) {
             const { name, temp, desc, icon, windKmh, windKnots, humidity, forecast } = locationData;
 
-            // Check the 14-knot critical condition locally for the badge
+            // Warning Condition: 11 knots or more triggers the flashing border
             const isWarning = parseFloat(windKnots) >= 11;
+
             const warningBadge = isWarning
-                // Updated: Use animate-fast-pulse for quick flashing
+                // Badge animation is kept to flash the DANGER text itself
                 ? '<span class="ml-3 text-xs sm:text-sm inline-flex items-center rounded-full bg-red-800 px-3 py-1 font-medium text-red-300 shadow-md animate-fast-pulse">DANGER!</span>'
                 : '';
 
-            const borderColor = isWarning ? 'border-red-600' : 'border-sky-800';
+            // Apply the custom border-pulse animation class when warning is active
+            const borderColor = isWarning ? 'border-red-600 animate-border-pulse' : 'border-sky-800';
 
             return `
-                <div id="card-${name.replace(/\s/g, '-')}" class="weather-card p-6 rounded-xl border ${borderColor} frosted-panel">
+                <div id="card-${name.replace(/\s/g, '-')}" class="weather-card p-6 rounded-xl border-4 ${borderColor} frosted-panel">
                     
+                    <!-- Marina Name (Highlighted) -->
                     <h2 class="text-3xl font-extrabold text-sky-400 mb-2 flex items-center">
                         ${name}${warningBadge}
                     </h2>
                     
+                    <!-- Current Weather Icon -->
                     <div class="flex justify-center items-center my-4">
-                        <img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather Icon" class="w-24 h-24 filter drop-shadow-lg">
+                        <img src="https://openweathermap.org/img/wn/${icon}@2x.png" onerror="this.onerror=null;this.src='https://placehold.co/96x96/020617/ffffff?text=Icon'" alt="Weather Icon" class="w-24 h-24 filter drop-shadow-lg">
                     </div>
 
+                    <!-- Temperature -->
                     <div class="text-7xl font-black text-sky-200 mb-2">${temp}°C</div>
                     
+                    <!-- Description -->
                     <div class="text-xl font-medium text-gray-400 capitalize mb-6">${desc}</div>
 
+                    <!-- Details Section (Wind Speed & Humidity) -->
                     <div class="flex justify-around text-center border-t pt-4 border-gray-700">
                         
+                        <!-- Wind Speed -->
                         <div class="flex flex-col items-center">
                             <svg class="w-7 h-7 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                             <span class="text-sm font-semibold text-gray-400 mt-1">Wind Speed</span>
                             
+                            <!-- Displaying KM/H -->
                             <span class="text-xl font-bold ${isWarning ? 'text-red-400' : 'text-sky-300'} mt-0.5">${windKmh} km/h</span>
 
+                            <!-- Displaying Knots -->
                             <span class="text-sm font-light text-gray-400">(${windKnots} knots)</span>
                         </div>
                         
+                        <!-- Humidity (Icon is rotated 180 degrees as previously requested) -->
                         <div class="flex flex-col items-center">
-                           <svg class="w-7 h-7 text-emerald-500 transform rotate-180" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                           <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-                           </svg>
-                           <span class="text-sm font-semibold text-gray-400 mt-1">Humidity</span>
-                          <span class="text-xl font-bold text-emerald-300 mt-0.5">${humidity}%</span>
-                    </div>
+                            <svg class="w-7 h-7 text-emerald-500 transform rotate-180" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                            </svg>
+                            <span class="text-sm font-semibold text-gray-400 mt-1">Humidity</span>
+                            <span class="text-xl font-bold text-emerald-300 mt-0.5">${humidity}%</span>
+                        </div>
                     </div>
 
+                    <!-- 3-DAY FORECAST SECTION -->
                     <div class="mt-6 pt-4 border-t border-gray-700">
                         <h3 class="text-lg font-semibold text-sky-400 mb-3">3-Day Sailing Forecast</h3>
                         <div class="flex justify-between space-x-2 text-center">
@@ -366,10 +396,13 @@
                                 <div class="flex-1 p-2 rounded-lg bg-gray-900/50 shadow-inner">
                                     <div class="text-sm font-semibold text-gray-300">${day.day}</div>
                                     
-                                    <img src="https://openweathermap.org/img/wn/${day.icon}.png" alt="Forecast Icon" class="w-10 h-10 mx-auto filter drop-shadow">
+                                    <!-- Weather Icon -->
+                                    <img src="https://openweathermap.org/img/wn/${day.icon}.png" onerror="this.onerror=null;this.src='https://placehold.co/40x40/020617/ffffff?text=Icon'" alt="Forecast Icon" class="w-10 h-10 mx-auto filter drop-shadow">
                                     
+                                    <!-- Avg Temp -->
                                     <div class="text-lg font-bold text-sky-200 mt-1">${day.avgTemp}°C</div>
                                     
+                                    <!-- Avg Wind Speed (knots) -->
                                     <div class="text-xs text-gray-400 mt-1">
                                         ${day.avgWindKnots} knots
                                     </div>
@@ -384,7 +417,7 @@
         // Function to handle showing the error state for a specific card (Dark theme version)
         function createErrorCardHtml(name, message) {
             return `
-                <div class="p-6 bg-red-900/30 rounded-xl border border-red-700 shadow-xl text-center frosted-panel">
+                <div class="p-6 bg-red-900/30 rounded-xl border-4 border-red-700 shadow-xl text-center frosted-panel">
                     <h2 class="text-2xl font-bold text-red-300 mb-2">${name}</h2>
                     <p class="text-sm text-red-400">${message || "Error loading data."}</p>
                     <p class="text-xs text-red-500 mt-2">Verify API key or network connection.</p>
@@ -453,7 +486,7 @@
             const cardDataResults = await Promise.all(cardPromises);
 
             let isGlobalDanger = false;
-            const dangerMarinas = []; // Array to collect names of marinas in danger
+            const dangerMarinas = []; // Array to collect names of marinas in danger (where wind >= 14 knots)
             const renderedCards = [];
 
             for (const result of cardDataResults) {
@@ -462,6 +495,8 @@
                     renderedCards.push(createErrorCardHtml(result.name, result.message));
                 } else {
                     // Result is successful data object: check danger condition, then render HTML
+                    
+                    // NOTE: The modal triggers for 14+ knots. The border flashes for 11+ knots (inside createCardHtml).
                     if (parseFloat(result.windKnots) >= 14) {
                         isGlobalDanger = true;
                         dangerMarinas.push(result.name); // Collect the name of the dangerous marina
