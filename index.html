@@ -315,8 +315,8 @@
         function createCardHtml(locationData) {
             const { name, temp, desc, icon, windKmh, windKnots, humidity, forecast } = locationData;
 
-            // Check the 14-knot critical condition locally for the badge
-            const isWarning = parseFloat(windKnots) > 14;
+            // Check the 10-knot critical condition locally for the badge
+            const isWarning = parseFloat(windKnots) > 10;
             const warningBadge = isWarning
                 // Updated: Use animate-fast-pulse for quick flashing
                 ? '<span class="ml-3 text-xs sm:text-sm inline-flex items-center rounded-full bg-red-800 px-3 py-1 font-medium text-red-300 shadow-md animate-fast-pulse">DANGER!</span>'
