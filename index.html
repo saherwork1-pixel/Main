@@ -5,7 +5,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Live Weather Dashboard</title>
-    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom styles for Inter font and full viewport height */
@@ -79,54 +78,40 @@
 
 <body class="flex flex-col items-center p-4 sm:p-8">
 
-    <!-- 1. Background Video Element -->
     <video autoplay muted loop id="background-video">
-        <!-- Placeholder video source - replace with 'back.mp4' if available locally -->
         <source src="back.mp4" type="video/mp4"
             onerror="this.onerror=null;this.src='https://assets.mixkit.co/videos/preview/mixkit-beautiful-view-of-the-sea-from-the-shore-43952-large.mp4';">
         Your browser does not support the video tag.
     </video>
 
-    <!-- 2. Main Content Wrapper: Ensures all visible content floats above the video -->
     <main class="relative z-10 w-full max-w-7xl flex flex-col items-center">
 
-        <!-- LIVE CLOCK SECTION - Now with frosted background -->
         <div id="uae-clock"
             class="text-center mb-10 p-4 sm:p-6 rounded-xl shadow-2xl border border-sky-800 w-full max-w-xl mx-auto frosted-panel">
-            <!-- Clock content will be injected here by JavaScript -->
-        </div>
+            </div>
 
         <h1 class="text-4xl font-extrabold text-sky-300 mb-12 border-b-2 border-sky-500/50 pb-2">
             Abu Dhabi Marina Weather & Location Tracker
         </h1>
 
-        <!-- Container for multiple weather cards (Responsive Grid) -->
-        <!-- This container will hold the loading spinner/cards dynamically -->
         <div id="cards-container"
             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[repeat(3,minmax(0,1fr))] gap-10 max-w-7xl w-full mb-12">
-            <!-- Initial content will be loaded by loadAllWeather -->
-        </div>
+            </div>
 
-        <!-- Professional Map Section -->
         <h2 class="text-3xl font-bold text-gray-200 mb-6 mt-6">Marina Location Map</h2>
         <div class="w-full max-w-7xl rounded-xl overflow-hidden shadow-2xl border-4 border-sky-900/50 frosted-panel">
-            <!-- Using a search query with coordinates (Name@lat,lon) for high precision -->
             <iframe
                 src="https://maps.google.com/maps?q=Royal+M+Marina@24.447700,54.337994,Yas+Island+Marina@24.467729,54.609596,Saadiyat+Island+Marina@24.560394,54.459160,Emirates+Palace+Marina@24.4839,54.6033,Al-Dar+Marina,+Abu+Dhabi&output=embed"
                 width="100%" height="500" style="border:0;" allowfullscreen="" loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade">
             </iframe>
         </div>
-        <!-- End Map Section -->
+        </main>
 
-    </main>
-
-    <!-- DANGER ALERT MODAL (Custom, replaces alert()) -->
     <div id="danger-modal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-70 items-center justify-center">
         <div
             class="frosted-panel p-8 rounded-xl shadow-2xl max-w-lg w-full border-4 border-red-600 transform transition-all duration-300 scale-100">
             <div class="text-center">
-                <!-- Danger Icon - Using the new animate-fast-pulse class -->
                 <svg class="mx-auto h-16 w-16 text-red-500 animate-fast-pulse" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -134,7 +119,6 @@
                     </path>
                 </svg>
                 <h3 class="mt-4 text-3xl font-extrabold text-red-400">DANGER ALERT</h3>
-                <!-- Message is dynamically updated by JS -->
                 <p id="alert-message" class="mt-2 text-lg text-gray-300 font-medium">
                     Critical wind speeds exceeding 10 knots detected. It is highly dangerous to sail now.
                 </p>
@@ -343,46 +327,38 @@
             return `
                 <div id="card-${name.replace(/\s/g, '-')}" class="weather-card p-6 rounded-xl border ${borderColor} frosted-panel">
                     
-                    <!-- Marina Name (Highlighted) -->
                     <h2 class="text-3xl font-extrabold text-sky-400 mb-2 flex items-center">
                         ${name}${warningBadge}
                     </h2>
                     
-                    <!-- Current Weather Icon -->
                     <div class="flex justify-center items-center my-4">
                         <img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather Icon" class="w-24 h-24 filter drop-shadow-lg">
                     </div>
 
-                    <!-- Temperature -->
                     <div class="text-7xl font-black text-sky-200 mb-2">${temp}°C</div>
                     
-                    <!-- Description -->
                     <div class="text-xl font-medium text-gray-400 capitalize mb-6">${desc}</div>
 
-                    <!-- Details Section (Wind Speed & Humidity) -->
                     <div class="flex justify-around text-center border-t pt-4 border-gray-700">
                         
-                        <!-- Wind Speed -->
                         <div class="flex flex-col items-center">
                             <svg class="w-7 h-7 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                             <span class="text-sm font-semibold text-gray-400 mt-1">Wind Speed</span>
                             
-                            <!-- Displaying KM/H -->
                             <span class="text-xl font-bold ${isWarning ? 'text-red-400' : 'text-sky-300'} mt-0.5">${windKmh} km/h</span>
 
-                            <!-- Displaying Knots -->
                             <span class="text-sm font-light text-gray-400">(${windKnots} knots)</span>
                         </div>
                         
-                        <!-- Humidity -->
                         <div class="flex flex-col items-center">
-                            <svg class="w-7 h-7 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v5m-2 2h4M9 14h6m-3-3l-2 1m0 0l-2-1m2 1v5m-2 2h4"></path></svg>
-                            <span class="text-sm font-semibold text-gray-400 mt-1">Humidity</span>
-                            <span class="text-xl font-bold text-emerald-300 mt-0.5">${humidity}%</span>
-                        </div>
+                           <svg class="w-7 h-7 text-emerald-500 transform rotate-180" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                           <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                           </svg>
+                           <span class="text-sm font-semibold text-gray-400 mt-1">Humidity</span>
+                          <span class="text-xl font-bold text-emerald-300 mt-0.5">${humidity}%</span>
+                    </div>
                     </div>
 
-                    <!-- 3-DAY FORECAST SECTION -->
                     <div class="mt-6 pt-4 border-t border-gray-700">
                         <h3 class="text-lg font-semibold text-sky-400 mb-3">3-Day Sailing Forecast</h3>
                         <div class="flex justify-between space-x-2 text-center">
@@ -390,13 +366,10 @@
                                 <div class="flex-1 p-2 rounded-lg bg-gray-900/50 shadow-inner">
                                     <div class="text-sm font-semibold text-gray-300">${day.day}</div>
                                     
-                                    <!-- Weather Icon -->
                                     <img src="https://openweathermap.org/img/wn/${day.icon}.png" alt="Forecast Icon" class="w-10 h-10 mx-auto filter drop-shadow">
                                     
-                                    <!-- Avg Temp -->
                                     <div class="text-lg font-bold text-sky-200 mt-1">${day.avgTemp}°C</div>
                                     
-                                    <!-- Avg Wind Speed (knots) -->
                                     <div class="text-xs text-gray-400 mt-1">
                                         ${day.avgWindKnots} knots
                                     </div>
