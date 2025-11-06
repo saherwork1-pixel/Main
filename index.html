@@ -462,7 +462,7 @@
                     renderedCards.push(createErrorCardHtml(result.name, result.message));
                 } else {
                     // Result is successful data object: check danger condition, then render HTML
-                    if (parseFloat(result.windKnots) => 10) {
+                    if (parseFloat(result.windKnots) >= 10) {
                         isGlobalDanger = true;
                         dangerMarinas.push(result.name); // Collect the name of the dangerous marina
                     }
