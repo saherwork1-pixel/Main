@@ -105,14 +105,15 @@
         Your browser does not support the video tag.
     </video>
 
-    <main class="relative z-10 w-full max-w-7xl flex flex-col items-center">
+    <!-- REMOVED max-w-7xl to allow full width scaling -->
+    <main class="relative z-10 w-full flex flex-col items-center"> 
 
         <h1 class="text-4xl font-extrabold text-sky-300 mb-8 border-b-2 border-sky-500/50 pb-2">
             Abu Dhabi Marina Weather & Location Tracker
         </h1>
 
-        <!-- NEW FLEX CONTAINER: Layout for Clock, Cards (3/4 width) and Alerts (1/4 width) -->
-        <div class="w-full max-w-7xl flex flex-col lg:flex-row lg:space-x-8 mb-12">
+        <!-- NEW FLEX CONTAINER: Removed max-w-7xl -->
+        <div class="w-full flex flex-col lg:flex-row lg:space-x-8 mb-12">
 
             <!-- LEFT COLUMN: Clock and Weather Cards (3/4 width on large screens) -->
             <div class="lg:w-3/4 w-full">
@@ -154,10 +155,11 @@
         <!-- END NEW FLEX CONTAINER -->
 
         <h2 class="text-3xl font-bold text-gray-200 mb-6 mt-6">Marina Location Map</h2>
-        <div class="w-full max-w-7xl rounded-xl overflow-hidden shadow-2xl border-4 border-sky-900/50 frosted-panel">
+        <!-- Removed max-w-7xl from map container -->
+        <div class="w-full rounded-xl overflow-hidden shadow-2xl border-4 border-sky-900/50 frosted-panel">
             <iframe
                 src="https://maps.google.com/maps?q=Royal+M+Marina@24.447700,54.337994,Yas+Island+Marina@24.467729,54.609596,Saadiyat+Island+Marina@24.560394,54.459160,Emirates+Palace+Marina@24.4839,54.6033,Al-Dar+Marina,+Abu+Dhabi&output=embed"
-                width="100%" height="500" style="border:0;" allowfullscreen="" loading="lazy"
+                width="100%" height="1000" style="border:0;" allowfullscreen="" loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade">
             </iframe>
         </div>
@@ -592,6 +594,19 @@
             setInterval(loadAllWeather, 10000);
         };
     </script>
+    <br><br><b><br><br>
+    <script type="text/javascript">
+        // Map appearance
+        var width = "80%";         // width in pixels or percentage
+        var height = "1000";         // height in pixels
+        var width = "2000";
+        var latitude = "24.446736";      // center latitude (decimal degrees)
+        var longitude = "54.394089";     // center longitude (decimal degrees)
+        var zoom = "8";             // initial zoom (between 3 and 18)
+        var names = true;          // always show ship names (defaults to false)
+        
+    </script>
+    <script type="text/javascript" src="https://www.vesselfinder.com/aismap.js"></script>
 </body>
 
 </html>
