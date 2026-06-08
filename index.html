@@ -2,611 +2,1101 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Live Weather Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Custom styles for Inter font and full viewport height */
-        body {
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            /* Remove gradient background as video is now the background */
-            background: transparent;
-            color: #e2e8f0;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shawarma Nutritional Comparison Report</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        /* Style for the background video to cover the entire viewport */
-        #background-video {
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            z-index: -100;
-            /* Place it far behind all content */
-            filter: brightness(50%);
-            /* Darken video slightly for better text contrast */
-        }
+    :root {
+      --gold: #C8963E;
+      --gold-light: #F5E6C8;
+      --gold-dark: #8B6520;
+      --deep: #1A1208;
+      --warm-bg: #FDFAF4;
+      --card-bg: #FFFFFF;
+      --text-primary: #1A1208;
+      --text-secondary: #5C4A2A;
+      --text-muted: #8B7355;
+      --border: #E8D9B8;
+      --r1: #185FA5;
+      --r1-light: #E6F1FB;
+      --r1-mid: #378ADD;
+      --r2: #0F6E56;
+      --r2-light: #E1F5EE;
+      --r2-mid: #1D9E75;
+      --diff-pos: #3B6D11;
+      --diff-pos-bg: #EAF3DE;
+      --diff-neg: #A32D2D;
+      --diff-neg-bg: #FCEBEB;
+      --diff-neu: #5F5E5A;
+      --diff-neu-bg: #F1EFE8;
+    }
 
-        /* Frosted Glass Effect: Applied to both cards and the clock panel */
-        .frosted-panel {
-            background-color: rgba(15, 23, 42, 0.7);
-            /* Slightly translucent dark background */
-            backdrop-filter: blur(10px);
-            /* The crucial blurring effect */
-            -webkit-backdrop-filter: blur(10px);
-            /* Safari support */
-        }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--warm-bg);
+      color: var(--text-primary);
+      font-size: 15px;
+      line-height: 1.6;
+    }
 
-        /* Custom card styling, now inheriting blur from frosted-panel */
-        .weather-card {
-            /* Stronger, darker shadow */
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-            transition: all 0.4s ease-in-out;
-        }
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+    }
 
-        .weather-card:hover {
-            transform: translateY(-5px);
-            /* Lift card slightly */
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.6);
-        }
+    /* ── HEADER ── */
+    .report-header {
+      border-bottom: 2px solid var(--gold);
+      padding-bottom: 32px;
+      margin-bottom: 48px;
+    }
 
-        /* --- Custom styles for faster flashing (for the DANGER text) --- */
-        @keyframes fast-pulse {
-            0%,
-            100% {
-                opacity: 1;
-            }
+    .header-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
 
-            50% {
-                opacity: 0.2;
-            }
-        }
+    .report-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 42px;
+      line-height: 1.15;
+      color: var(--deep);
+      margin-bottom: 8px;
+    }
 
-        .animate-fast-pulse {
-            animation: fast-pulse 0.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
+    .report-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      font-weight: 300;
+      margin-bottom: 24px;
+    }
 
-        /* --- Custom styles for the Border flashing --- */
-        @keyframes border-pulse {
-            0% {
-                border-color: rgba(239, 68, 68, 0.4);
-                /* Faded Red */
-                box-shadow: 0 0 5px rgba(239, 68, 68, 0.3);
-            }
+    .header-meta {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
 
-            50% {
-                border-color: rgba(255, 0, 0, 1);
-                /* Bright Red */
-                box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
-            }
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
 
-            100% {
-                border-color: rgba(239, 68, 68, 0.4);
-                box-shadow: 0 0 5px rgba(239, 68, 68, 0.3);
-            }
-        }
+    .meta-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
 
-        .animate-border-pulse {
-            animation: border-pulse 1.5s infinite ease-in-out;
-        }
-        /* End of new border pulse styles */
-    </style>
+    .meta-value {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    /* ── RESTAURANT BADGES ── */
+    .restaurant-badges {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .r-badge {
+      padding: 20px 24px;
+      border-radius: 12px;
+      border: 1.5px solid;
+    }
+
+    .r-badge.r1 {
+      background: var(--r1-light);
+      border-color: var(--r1-mid);
+    }
+
+    .r-badge.r2 {
+      background: var(--r2-light);
+      border-color: var(--r2-mid);
+    }
+
+    .r-badge-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    .r1 .r-badge-dot {
+      background: var(--r1);
+    }
+
+    .r2 .r-badge-dot {
+      background: var(--r2);
+    }
+
+    .r-badge-name {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .r1 .r-badge-name {
+      color: #0C447C;
+    }
+
+    .r2 .r-badge-name {
+      color: #085041;
+    }
+
+    .r-badge-arabic {
+      font-size: 20px;
+      font-weight: 400;
+      margin-top: 6px;
+      color: var(--text-primary);
+    }
+
+    .r-badge-count {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* ── SECTION TITLES ── */
+    .section-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 26px;
+      color: var(--deep);
+      margin-bottom: 6px;
+    }
+
+    .section-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .section-divider {
+      width: 48px;
+      height: 3px;
+      background: var(--gold);
+      border-radius: 2px;
+      margin-bottom: 24px;
+    }
+
+    /* ── DATA TABLES ── */
+    .table-section {
+      margin-bottom: 56px;
+    }
+
+    .table-wrapper {
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .table-header-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .r1 .table-header-bar {
+      background: var(--r1-light);
+    }
+
+    .r2 .table-header-bar {
+      background: var(--r2-light);
+    }
+
+    .table-header-bar .badge {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .r1 .badge {
+      background: var(--r1);
+      color: #fff;
+    }
+
+    .r2 .badge {
+      background: var(--r2);
+      color: #fff;
+    }
+
+    .table-header-bar .t-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead th {
+      padding: 11px 16px;
+      text-align: right;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: #FAFAF8;
+      border-bottom: 1px solid var(--border);
+    }
+
+    thead th:first-child {
+      text-align: left;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: #FAFAF6;
+    }
+
+    tbody td {
+      padding: 12px 16px;
+      text-align: right;
+      color: var(--text-primary);
+    }
+
+    tbody td:first-child {
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .total-cell {
+      font-weight: 600;
+      color: var(--deep);
+    }
+
+    .dash {
+      color: var(--text-muted);
+    }
+
+    /* ── CHARTS ── */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+
+    .chart-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .chart-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .chart-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    /* ── COMPARISON TABLE ── */
+    .comparison-section {
+      margin-bottom: 56px;
+    }
+
+    .comp-table-wrapper {
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .comp-table thead th {
+      padding: 12px 16px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: #FAFAF8;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comp-table thead th:first-child {
+      text-align: left;
+    }
+
+    .comp-table tbody td {
+      padding: 12px 16px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comp-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .comp-table tbody tr:hover td {
+      background: #FAFAF6;
+    }
+
+    .comp-table tbody td:first-child {
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .r1-val {
+      color: #0C447C;
+      font-weight: 500;
+    }
+
+    .r2-val {
+      color: #085041;
+      font-weight: 500;
+    }
+
+    .diff-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .diff-up {
+      background: var(--diff-pos-bg);
+      color: var(--diff-pos);
+    }
+
+    .diff-down {
+      background: var(--diff-neg-bg);
+      color: var(--diff-neg);
+    }
+
+    .diff-same {
+      background: var(--diff-neu-bg);
+      color: var(--diff-neu);
+    }
+
+    /* ── INSIGHT CARDS ── */
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .insight-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .insight-icon {
+      font-size: 22px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .insight-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .insight-text {
+      font-size: 14px;
+      color: var(--text-primary);
+      line-height: 1.55;
+    }
+
+    .highlight-r1 {
+      color: var(--r1);
+      font-weight: 600;
+    }
+
+    .highlight-r2 {
+      color: var(--r2);
+      font-weight: 600;
+    }
+
+    .highlight-gold {
+      color: var(--gold-dark);
+      font-weight: 600;
+    }
+
+    /* ── WINNER BANNER ── */
+    .winner-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 56px;
+    }
+
+    .winner-card {
+      border-radius: 12px;
+      padding: 24px;
+      border: 1.5px solid;
+    }
+
+    .winner-card.r1 {
+      background: var(--r1-light);
+      border-color: var(--r1-mid);
+    }
+
+    .winner-card.r2 {
+      background: var(--r2-light);
+      border-color: var(--r2-mid);
+    }
+
+    .winner-tag {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .r1 .winner-tag {
+      background: var(--r1);
+      color: #fff;
+    }
+
+    .r2 .winner-tag {
+      background: var(--r2);
+      color: #fff;
+    }
+
+    .winner-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      color: var(--deep);
+      margin-bottom: 8px;
+    }
+
+    .winner-body {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* ── FOOTER ── */
+    .report-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-note {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .footer-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 16px;
+      color: var(--gold-dark);
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        padding: 32px 16px 60px;
+      }
+
+      .report-title {
+        font-size: 30px;
+      }
+
+      .charts-grid,
+      .insights-grid,
+      .winner-section,
+      .restaurant-badges {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .download-btn-container {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    .report-header {
+      position: relative;
+    }
+
+    .download-btn {
+      background: var(--gold);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .download-btn:hover {
+      background: var(--gold-dark);
+      transform: translateY(-1px);
+    }
+
+    .chart-same-size {
+  width: 700px;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+  </style>
 </head>
 
-<body class="flex flex-col items-center p-4 sm:p-8">
+<body>
+  <header class="report-header">
+    <div class="download-btn-container">
+      <button onclick="downloadReport()" class="download-btn">
+        ⬇ Download Report
+      </button>
+    </div>
+  </header>
+  <div class="page">
 
-    <video autoplay muted loop id="background-video">
-        <source src="back.mp4" type="video/mp4"
-            onerror="this.onerror=null;this.src='https://assets.mixkit.co/videos/preview/mixkit-beautiful-view-of-the-sea-from-the-shore-43952-large.mp4';">
-        Your browser does not support the video tag.
-    </video>
-
-    <!-- REMOVED max-w-7xl to allow full width scaling -->
-    <main class="relative z-10 w-full flex flex-col items-center"> 
-
-        <h1 class="text-4xl font-extrabold text-sky-300 mb-8 border-b-2 border-sky-500/50 pb-2">
-            Abu Dhabi Marina Weather & Location Tracker
-        </h1>
-
-        <!-- NEW FLEX CONTAINER: Removed max-w-7xl -->
-        <div class="w-full flex flex-col lg:flex-row lg:space-x-8 mb-12">
-
-            <!-- LEFT COLUMN: Clock and Weather Cards (3/4 width on large screens) -->
-            <div class="lg:w-3/4 w-full">
-
-                <!-- Clock Panel -->
-                <div id="uae-clock"
-                    class="text-center mb-8 p-4 sm:p-6 rounded-xl shadow-2xl border border-sky-800 w-full mx-auto frosted-panel">
-                </div>
-
-                <!-- Weather Cards Container -->
-                <div id="cards-container"
-                    class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 w-full">
-                    <!-- Cards will be injected here -->
-                </div>
-            </div>
-
-            <!-- RIGHT COLUMN: Live Alerts Panel (1/4 width on large screens) -->
-            <div class="lg:w-1/4 w-full mt-8 lg:mt-0">
-                <div id="live-alerts-panel"
-                    class="frosted-panel p-4 rounded-xl shadow-2xl border border-red-800 lg:sticky lg:top-8">
-                    <h3 class="text-xl font-bold text-red-400 border-b pb-2 mb-4 border-red-900 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-red-500 animate-fast-pulse" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.394 16c-.77 1.333.192 3 1.732 3z">
-                            </path>
-                        </svg>
-                        Live Sailing Alerts
-                    </h3>
-                    <p class="text-gray-400 text-sm mb-4" id="alerts-status">
-                        <!-- Alert status message injected here -->
-                    </p>
-                    <div id="danger-alerts-list" class="space-y-3">
-                        <!-- Danger alerts will be injected here -->
-                    </div>
-                </div>
-            </div>
+    <!-- HEADER -->
+    <header class="report-header">
+      <div class="header-label">Nutritional Analysis Report</div>
+      <h1 class="report-title">Shawarma Menu<br>Comparison</h1>
+      <p class="report-subtitle">A full nutritional breakdown and comparative study across two restaurants</p>
+      <div class="header-meta">
+        <div class="meta-item">
+          <span class="meta-label">Report Date</span>
+          <span class="meta-value">June 2026</span>
         </div>
-        <!-- END NEW FLEX CONTAINER -->
-
-        <h2 class="text-3xl font-bold text-gray-200 mb-6 mt-6">Marina Location Map</h2>
-        <!-- Removed max-w-7xl from map container -->
-        <div class="w-full rounded-xl overflow-hidden shadow-2xl border-4 border-sky-900/50 frosted-panel">
-            <iframe
-                src="https://maps.google.com/maps?q=Royal+M+Marina@24.447700,54.337994,Yas+Island+Marina@24.467729,54.609596,Saadiyat+Island+Marina@24.560394,54.459160,Emirates+Palace+Marina@24.4839,54.6033,Al-Dar+Marina,+Abu+Dhabi&output=embed"
-                width="100%" height="1000" style="border:0;" allowfullscreen="" loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade">
-            </iframe>
+        <div class="meta-item">
+          <span class="meta-label">Restaurants</span>
+          <span class="meta-value">2 Establishments</span>
         </div>
-    </main>
-    
-    <!-- DANGER MODAL REMOVED -->
+        <div class="meta-item">
+          <span class="meta-label">Menu Items Analysed</span>
+          <span class="meta-value">7 Items</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Macros Tracked</span>
+          <span class="meta-value">Weight, Pickles, Bread, Fries, Chicken, Mayo</span>
+        </div>
+      </div>
+    </header>
 
-    <script>
-        // --- UTILITY FUNCTION: Exponential Backoff for API Calls ---
-        async function exponentialBackoffFetch(url, maxRetries = 5) {
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    const response = await fetch(url);
-                    // On success or a non-retryable status (like 4xx errors)
-                    if (response.ok || response.status < 500) {
-                        return response;
-                    }
-                    // For server errors (5xx), fall through to retry
-                } catch (error) {
-                    // Network error, fall through to retry
-                    if (i === maxRetries - 1) throw error; // Re-throw if last attempt
-                }
+    <!-- RESTAURANT OVERVIEW -->
+    <div class="restaurant-badges">
+      <div class="r-badge r1">
+        <div><span class="r-badge-dot"></span><span class="r-badge-name">Bait Al Khetiar</span></div>
+        <div class="r-badge-arabic">بيت الختيار</div>
+        <div class="r-badge-count">3 menu items tracked</div>
+      </div>
+      <div class="r-badge r2">
+        <div><span class="r-badge-dot"></span><span class="r-badge-name">Al Ajaweed</span></div>
+        <div class="r-badge-arabic">الأجاويد</div>
+        <div class="r-badge-count">4 menu items tracked</div>
+      </div>
+    </div>
 
-                // Calculate delay: 2^i seconds (1s, 2s, 4s, 8s, ...)
-                const delay = Math.pow(2, i) * 1000;
-                await new Promise(resolve => setTimeout(resolve, delay));
-            }
-            throw new Error(`Failed to fetch data after ${maxRetries} retries.`);
+    <!-- TABLE 1 -->
+    <section class="table-section">
+      <h2 class="section-title">Restaurant Data Tables</h2>
+      <div class="section-divider"></div>
+      <p class="section-subtitle">Raw nutritional data per serving for each establishment</p>
+
+      <div class="table-wrapper r1" style="margin-bottom: 24px;">
+        <div class="table-header-bar r1">
+          <span class="badge">Restaurant 1</span>
+          <span class="t-title">Bait Al Khetiar — بيت الختيار</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Total (g)</th>
+              <th>Pickles (g)</th>
+              <th>Bread (g)</th>
+              <th>Fries (g)</th>
+              <th>Chicken (g)</th>
+              <th>Mayo (g)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Arabic Baked Bread</td>
+              <td class="total-cell">235</td>
+              <td>10</td>
+              <td>78</td>
+              <td>27</td>
+              <td>124</td>
+              <td>10</td>
+            </tr>
+            <tr>
+              <td>Saj Shawarma</td>
+              <td class="total-cell">265</td>
+              <td>12</td>
+              <td>77</td>
+              <td><span class="dash">—</span></td>
+              <td>150</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>Samoon</td>
+              <td class="total-cell">392</td>
+              <td>15</td>
+              <td>150</td>
+              <td>40</td>
+              <td>165</td>
+              <td>20</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-wrapper r2">
+        <div class="table-header-bar r2">
+          <span class="badge">Restaurant 2</span>
+          <span class="t-title">Al Ajaweed — الأجاويد</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Bread (g)</th>
+              <th>Total (g)</th>
+              <th>Fries (g)</th>
+              <th>Pickles (g)</th>
+              <th>Chicken (g)</th>
+              <th>Mayo (g)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Arabic Bread Shawarma (Large)</td>
+              <td>88</td>
+              <td class="total-cell">246</td>
+              <td>12</td>
+              <td>10</td>
+              <td>100</td>
+              <td>30</td>
+            </tr>
+            <tr>
+              <td>Samoon Shawarma</td>
+              <td>150</td>
+              <td class="total-cell">369</td>
+              <td><span class="dash">—</span></td>
+              <td>18</td>
+              <td>162</td>
+              <td>30</td>
+            </tr>
+            <tr>
+              <td>Arabic Bread Shawarma (Small)</td>
+              <td>60</td>
+              <td class="total-cell">170</td>
+              <td>15</td>
+              <td>10</td>
+              <td>75</td>
+              <td>10</td>
+            </tr>
+            <tr>
+              <td>Shawarma Saj</td>
+              <td>50</td>
+              <td class="total-cell">222</td>
+              <td><span class="dash">—</span></td>
+              <td>10</td>
+              <td>140</td>
+              <td>20</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CHARTS -->
+    <section style="margin-bottom: 56px;">
+      <h2 class="section-title">Visual Analysis</h2>
+      <div class="section-divider"></div>
+      <p class="section-subtitle">Weight and chicken content across all comparable items</p>
+
+      <div class="charts-grid">
+        <div class="chart-card chart-same-size">
+          <div class="chart-title">Weight comparison</div>
+          <div class="chart-desc">All items side by side</div>
+          <div style="position: relative; width: 100%; height: 200px;">
+            <canvas id="calorieChart" role="img"
+              aria-label="Bar chart comparing gories across all shawarma items at both restaurants">Calorie counts range
+              from 170 to 392 gories across all items.</canvas>
+          </div>
+          <div style="display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: #5C4A2A; flex-wrap: wrap;">
+            <span style="display:flex;align-items:center;gap:4px;"><span
+                style="width:10px;height:10px;border-radius:2px;background:#185FA5;display:inline-block;"></span>Bait Al
+              Khetiar</span>
+            <span style="display:flex;align-items:center;gap:4px;"><span
+                style="width:10px;height:10px;border-radius:2px;background:#0F6E56;display:inline-block;"></span>Al
+              Ajaweed</span>
+          </div>
+        </div>
+
+        <div class="chart-card chart-same-size">
+          <div class="chart-title">Chicken content (g)</div>
+          <div class="chart-desc">Pickles-dense ingredient comparison</div>
+          <div style="position: relative; width: 100%; height: 200px;">
+            <canvas id="chickenChart" role="img"
+              aria-label="Bar chart comparing chicken content in grams across all menu items">Chicken content ranges
+              from 75g to 165g across all items.</canvas>
+          </div>
+          <div style="display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: #5C4A2A; flex-wrap: wrap;">
+            <span style="display:flex;align-items:center;gap:4px;"><span
+                style="width:10px;height:10px;border-radius:2px;background:#185FA5;display:inline-block;"></span>Bait Al
+              Khetiar</span>
+            <span style="display:flex;align-items:center;gap:4px;"><span
+                style="width:10px;height:10px;border-radius:2px;background:#0F6E56;display:inline-block;"></span>Al
+              Ajaweed</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card" style="margin-bottom:0; max-width:700px; margin-left:auto; margin-right:auto;">
+        <div class="chart-title">Macronutrient breakdown — Saj Shawarma (head-to-head)</div>
+        <div class="chart-desc">Direct comparison of the same dish type at both restaurants</div>
+        <div style="position: relative; width: 100%; height: 200px;">
+          <canvas id="macroChart" role="img"
+            aria-label="Grouped bar chart comparing macros for Saj Shawarma at both restaurants">Saj Shawarma macro
+            comparison between Bait Al Khetiar and Al Ajaweed.</canvas>
+        </div>
+        <div style="display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: #5C4A2A; flex-wrap: wrap;">
+          <span style="display:flex;align-items:center;gap:4px;"><span
+              style="width:10px;height:10px;border-radius:2px;background:#185FA5;display:inline-block;"></span>Bait Al
+            Khetiar Saj</span>
+          <span style="display:flex;align-items:center;gap:4px;"><span
+              style="width:10px;height:10px;border-radius:2px;background:#0F6E56;display:inline-block;"></span>Al
+            Ajaweed Saj</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- HEAD-TO-HEAD COMPARISON -->
+    <section class="comparison-section">
+      <h2 class="section-title">Head-to-Head: Comparable Items</h2>
+      <div class="section-divider"></div>
+      <p class="section-subtitle">Direct comparison of equivalent item types. Difference shows Al Ajaweed vs Bait Al
+        Khetiar.</p>
+
+      <div class="comp-table-wrapper">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th>Item Type</th>
+              <th>Bait Al Khetiar (g)</th>
+              <th>Al Ajaweed (g)</th>
+              <th>Grams Diff</th>
+              <th>Bait AL khetair Chicken</th>
+              <th>Nakheel Chicken</th>
+              <th>Chicken Diff</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Saj Shawarma</td>
+              <td class="r1-val">265</td>
+              <td class="r2-val">222</td>
+              <td><span class="diff-badge diff-down">−43 g</span></td>
+              <td class="r1-val">150g</td>
+              <td class="r2-val">140g</td>
+              <td><span class="diff-badge diff-down">−10g</span></td>
+            </tr>
+            <tr>
+              <td>Samoon Shawarma</td>
+              <td class="r1-val">392</td>
+              <td class="r2-val">369</td>
+              <td><span class="diff-badge diff-down">−23 g</span></td>
+              <td class="r1-val">165g</td>
+              <td class="r2-val">162g</td>
+              <td><span class="diff-badge diff-same">−3g</span></td>
+            </tr>
+            <tr>
+              <td>Arabic Bread Shawarma</td>
+              <td class="r1-val">235</td>
+              <td class="r2-val">246 / 170</td>
+              <td><span class="diff-badge diff-up">+11 / −65</span></td>
+              <td class="r1-val">124g</td>
+              <td class="r2-val">100 / 75g</td>
+              <td><span class="diff-badge diff-down">−24 / −49g</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:12px; color: var(--text-muted); margin-top: 10px;">† Al Ajaweed offers Arabic Bread Shawarma
+        in two sizes (large 246 g / small 170 g), compared to Bait Al Khetiar's single size (235 g).</p>
+    </section>
+
+    <!-- KEY INSIGHTS -->
+    <section style="margin-bottom: 48px;">
+      <h2 class="section-title">Key Insights</h2>
+      <div class="section-divider"></div>
+      <div class="insights-grid">
+        <div class="insight-card">
+          <div class="insight-title">Grams Range</div>
+          <p class="insight-text"><span class="highlight-r1">Bait Al Khetiar</span> ranges from 235–392 g. <span
+              class="highlight-r2">Al Ajaweed</span> offers a wider spread: 170–369 g, giving customers more choice from
+            light to filling.</p>
+        </div>
+        <div class="insight-card">
+          <div class="insight-title">Chicken Generosity</div>
+          <p class="insight-text"><span class="highlight-r1">Bait Al Khetiar</span> consistently loads more chicken per
+            item — up to 165g in the Samoon vs 162g at <span class="highlight-r2">Al Ajaweed</span>. The Arabic Bread
+            gap is more pronounced: 124g vs 100g.</p>
+        </div>
+        <div class="insight-card">
+          <div class="insight-title">Mayo Usage</div>
+          <p class="insight-text"><span class="highlight-r2">Al Ajaweed</span> uses more mayo on average (20–30g) vs
+            <span class="highlight-r1">Bait Al Khetiar</span> (10–20g), which may contribute to richer taste but higher
+            fat content.
+          </p>
+        </div>
+        <div class="insight-card">
+          <div class="insight-title">Portion Sizing</div>
+          <p class="insight-text"><span class="highlight-r2">Al Ajaweed</span> offers size variety for Arabic Bread
+            Shawarma (170g small vs 246g large). <span class="highlight-r1">Bait Al Khetiar</span> has one standardised
+            size at 235 g.</p>
+        </div>
+        <div class="insight-card">
+          <div class="insight-title">Bread Content</div>
+          <p class="insight-text">The Samoon at <span class="highlight-r1">Bait Al Khetiar</span> contains exactly 150g
+            bread — identical to the Samoon Shawarma at <span class="highlight-r2">Al Ajaweed</span>. Consistency is
+            strong across this item type.</p>
+        </div>
+        <div class="insight-card">
+          <div class="insight-title">Menu Breadth</div>
+          <p class="insight-text"><span class="highlight-r2">Al Ajaweed</span> offers 4 distinct items including two
+            Arabic Bread sizes, giving more menu flexibility. <span class="highlight-r1">Bait Al Khetiar</span> focuses
+            on 3 core, well-defined items.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- VERDICT -->
+    <section style="margin-bottom: 56px;">
+      <h2 class="section-title">Overall Assessment</h2>
+      <div class="section-divider"></div>
+      <p class="section-subtitle">Summary verdict by category</p>
+      <div class="winner-section">
+        <div class="winner-card r1">
+          <span class="winner-tag">Best for pickles</span>
+          <div class="winner-title">Bait Al Khetiar — بيت الختيار</div>
+          <p class="winner-body">Wins on chicken quantity per item, particularly in Arabic Bread and Samoon categories.
+            Lower mayo use makes it the leaner choice overall. Ideal for customers prioritising pickles density and
+            clean macros.</p>
+        </div>
+        <div class="winner-card r2">
+          <span class="winner-tag">Best for variety</span>
+          <div class="winner-title">Al Ajaweed — الأجاويد</div>
+          <p class="winner-body">Offers more menu flexibility with size options and a lower-grams entry point (170 g).
+            Slightly lower gories on the Saj and Samoon make it suitable for gorie-conscious customers. Richer mayo
+            profile adds flavour.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="report-footer">
+      <span class="footer-note">Data sourced from handwritten nutritional records. Values are approximate. All weights
+        in grams unless noted.</span>
+      <span class="footer-logo">Nutritional Report · 2025</span>
+    </footer>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script>
+    const r1Color = '#185FA5';
+    const r2Color = '#0F6E56';
+    const r1Alpha = 'rgba(24,95,165,0.15)';
+    const r2Alpha = 'rgba(15,110,86,0.15)';
+
+    const baseOpts = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        x: { ticks: { font: { size: 9 }, autoSkip: false, maxRotation: 30 }, grid: { display: false } },
+        y: { ticks: { font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
+      }
+    };
+
+    new Chart(document.getElementById('calorieChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Arabic\nBread', 'Saj\nShawarma', 'Samoon', 'Arabic Bread\n(Large)', 'Samoon\nShawarma', 'Arabic Bread\n(Small)', 'Shawarma\nSaj'],
+        datasets: [
+          {
+            label: 'Bait Al Khetiar',
+            data: [235, 265, 392, null, null, null, null],
+            backgroundColor: r1Color,
+            borderRadius: 4,
+            barPercentage: 0.6
+          },
+          {
+            label: 'Al Ajaweed',
+            data: [null, null, null, 246, 369, 170, 222],
+            backgroundColor: r2Color,
+            borderRadius: 4,
+            barPercentage: 0.6
+          }
+        ]
+      },
+      options: { ...baseOpts, plugins: { ...baseOpts.plugins }, scales: { ...baseOpts.scales, y: { ...baseOpts.scales.y, min: 0, max: 430, title: { display: true, text: 'Weight (g)', font: { size: 11 } } } } }
+    });
+
+    new Chart(document.getElementById('chickenChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Arabic Bread', 'Saj', 'Samoon', 'Arab Bread (L)', 'Samoon', 'Arab Bread (S)', 'Saj'],
+        datasets: [
+          {
+            label: 'Bait Al Khetiar',
+            data: [124, 150, 165, null, null, null, null],
+            backgroundColor: r1Color,
+            borderRadius: 4,
+            barPercentage: 0.6
+          },
+          {
+            label: 'Al Ajaweed',
+            data: [null, null, null, 100, 162, 75, 140],
+            backgroundColor: r2Color,
+            borderRadius: 4,
+            barPercentage: 0.6
+          }
+        ]
+      },
+      options: { ...baseOpts, scales: { ...baseOpts.scales, y: { ...baseOpts.scales.y, min: 0, max: 200, title: { display: true, text: 'Grams (g)', font: { size: 11 } } } } }
+    });
+
+    new Chart(document.getElementById('macroChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Total (g)', 'Pickles (g)', 'Bread (g)', 'Chicken (g)', 'Mayo (g)'],
+        datasets: [
+          {
+            label: 'Bait Al Khetiar Saj',
+            data: [265, 12, 77, 150, 20],
+            backgroundColor: r1Color,
+            borderRadius: 4,
+            barPercentage: 0.7
+          },
+          {
+            label: 'Al Ajaweed Saj',
+            data: [222, 10, 50, 140, 20],
+            backgroundColor: r2Color,
+            borderRadius: 4,
+            barPercentage: 0.7
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { font: { size: 11 } }, grid: { display: false } },
+          y: { ticks: { font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
         }
+      }
+    });
+  </script>
+  <script>
+    function downloadReport() {
 
-        // --- LIVE CLOCK LOGIC (The "watch") ---
-        function updateClock() {
-            // Get current time in 'Asia/Dubai' timezone (UAE Time, UTC+4)
-            const now = new Date();
+      const element = document.documentElement;
 
-            // Format time components
-            const dayName = now.toLocaleDateString('en-US', {
-                weekday: 'long',
-                timeZone: 'Asia/Dubai'
-            });
-            const dateStr = now.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-                timeZone: 'Asia/Dubai'
-            });
-            // Show hours, minutes, and seconds
-            const timeStr = now.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: true,
-                timeZone: 'Asia/Dubai'
-            });
-
-            const clockElement = document.getElementById('uae-clock');
-            if (clockElement) {
-                clockElement.innerHTML = `
-                    <div class="text-md font-medium text-gray-300 mb-1">Current Time in UAE (GMT+4)</div>
-                    <div class="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                        <span class="text-5xl sm:text-6xl font-extrabold text-white leading-tight">${timeStr}</span>
-                        <span class="text-xl sm:text-2xl font-medium text-sky-300">${dayName}</span>
-                    </div>
-                    <div class="text-sm font-light text-gray-400 mt-2">${dateStr}</div>
-                `;
-            }
+      const opt = {
+        margin: 0.5,
+        filename: 'Shawarma_Comparison_Report.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true
+        },
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait'
+        },
+        pagebreak: {
+          mode: ['avoid-all', 'css', 'legacy']
         }
+      };
 
-        // Initialize and update the clock every second
-        updateClock();
-        setInterval(updateClock, 1000);
-
-        // --- FORECAST UTILITY ---
-
-        /**
-         * Processes the raw 3-hour forecast data to generate 3 daily summaries (Avg Temp, Avg Wind, Main Icon).
-         * @param {Array} forecastList - The 'list' array from the OpenWeatherMap forecast API response.
-         * @returns {Array<Object>} - An array of 3 daily forecast objects.
-         */
-        function processDailyForecast(forecastList) {
-            const dailyData = {};
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); // Start of today for day comparison
-
-            // Iterate over the 3-hourly forecast items
-            for (const item of forecastList) {
-                const date = new Date(item.dt * 1000);
-
-                // Calculate the difference in full days from the start of today
-                const dayDiff = Math.floor((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-
-                // We want days 1, 2, and 3 (tomorrow and the next two days)
-                if (dayDiff > 0 && dayDiff <= 3) {
-                    const dateKey = date.toISOString().split('T')[0]; // Use YYYY-MM-DD as key
-
-                    if (!dailyData[dateKey]) {
-                        dailyData[dateKey] = {
-                            day: date.toLocaleDateString('en-US', {
-                                weekday: 'short'
-                            }),
-                            temps: [],
-                            winds: [],
-                            icons: []
-                        };
-                    }
-
-                    dailyData[dateKey].temps.push(item.main.temp);
-                    dailyData[dateKey].winds.push(item.wind.speed); // m/s
-                    dailyData[dateKey].icons.push(item.weather[0].icon);
-                }
-            }
-
-            // Slice to ensure we only get the next 3 days, regardless of incomplete data
-            const dailyForecasts = Object.values(dailyData).slice(0, 3).map(dayEntry => {
-                // Calculate Avg Temp
-                const avgTemp = (dayEntry.temps.reduce((a, b) => a + b, 0) / dayEntry.temps.length);
-
-                // Calculate Avg Wind Speed (m/s) -> convert to knots
-                const avgWindMps = (dayEntry.winds.reduce((a, b) => a + b, 0) / dayEntry.winds.length);
-                // Convert m/s to knots: (m/s * 3.6 / 1.852)
-                const avgWindKnots = ((avgWindMps * 3.6) / 1.852).toFixed(1);
-
-                // Determine main icon (most frequent icon)
-                const iconCounts = dayEntry.icons.reduce((acc, icon) => {
-                    // Normalize icon by removing the time suffix (e.g., 01d and 01n both become 01)
-                    const normalizedIcon = icon.slice(0, 2);
-                    acc[normalizedIcon] = (acc[normalizedIcon] || 0) + 1;
-                    return acc;
-                }, {});
-
-                // Find the icon with the highest count, defaulting to the first one found
-                const mainIconNormalized = Object.keys(iconCounts).reduce((a, b) =>
-                    iconCounts[a] > iconCounts[b] ? a : b, Object.keys(iconCounts)[0]);
-
-                // Append 'd' (day) to the main icon for consistent display unless it's a normalized night icon
-                const mainIcon = mainIconNormalized + 'd';
-
-                return {
-                    day: dayEntry.day,
-                    avgTemp: Math.round(avgTemp),
-                    avgWindKnots: avgWindKnots,
-                    icon: mainIcon
-                };
-            });
-
-            return dailyForecasts;
-        }
-
-
-        // --- WEATHER LOGIC ---
-        // NOTE: The API key is exposed here for demo purposes. In a real application, use a backend proxy.
-        const apiKey = "7b38140838b1439b33dd60ab51488528";
-
-        // Define multiple locations by their precise Latitude and Longitude.
-        const locations = [
-            {
-                name: "Royal M Marina",
-                lat: 24.447700,
-                lon: 54.337994
-            },
-            {
-                name: "Yas Island Marina",
-                lat: 24.467729,
-                lon: 54.609596
-            },
-            {
-                name: "Saadiyat Island Marina",
-                lat: 24.560394,
-                lon: 54.459160
-            },
-            {
-                name: "Qasr Al-Emarat Marina",
-                lat: 24.4839,
-                lon: 54.6033
-            },
-            {
-                name: "Al-Dar Marina",
-                lat: 24.453231,
-                lon: 54.338079
-            },
-        ];
-
-        const container = document.getElementById("cards-container");
-
-        // Function to generate the loading HTML message
-        function getLoadingHtml(message) {
-            return `
-                <div class="col-span-full text-center text-xl text-gray-400 p-8 frosted-panel rounded-xl">
-                    <svg class="animate-spin h-6 w-6 mr-3 inline-block text-sky-400" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                        </path>
-                    </svg>
-                    ${message}
-                </div>
-            `;
-        }
-
-        // Function to create the HTML string for a single weather card
-        function createCardHtml(locationData) {
-            const {
-                name,
-                temp,
-                desc,
-                icon,
-                windKmh,
-                windKnots,
-                humidity,
-                forecast
-            } = locationData;
-
-            // Warning Condition: 11 knots or more triggers the flashing border
-            const isWarning = parseFloat(windKnots) >= 11;
-
-            const warningBadge = isWarning
-                // Badge animation is kept to flash the DANGER text itself
-                ?
-                '<span class="ml-3 text-xs sm:text-sm inline-flex items-center rounded-full bg-red-800 px-3 py-1 font-medium text-red-300 shadow-md animate-fast-pulse">DANGER!</span>' :
-                '';
-
-            // Apply the custom border-pulse animation class when warning is active
-            const borderColor = isWarning ? 'border-red-600 animate-border-pulse' : 'border-sky-800';
-
-            return `
-                <div id="card-${name.replace(/\s/g, '-')}" class="weather-card p-6 rounded-xl border-4 ${borderColor} frosted-panel">
-                    
-                    <!-- Marina Name (Highlighted) -->
-                    <h2 class="text-3xl font-extrabold text-sky-400 mb-2 flex items-center">
-                        ${name}${warningBadge}
-                    </h2>
-                    
-                    <!-- Current Weather Icon -->
-                    <div class="flex justify-center items-center my-4">
-                        <img src="https://openweathermap.org/img/wn/${icon}@2x.png" onerror="this.onerror=null;this.src='https://placehold.co/96x96/020617/ffffff?text=Icon'" alt="Weather Icon" class="w-24 h-24 filter drop-shadow-lg">
-                    </div>
-
-                    <!-- Temperature -->
-                    <div class="text-7xl font-black text-sky-200 mb-2">${temp}°C</div>
-                    
-                    <!-- Description -->
-                    <div class="text-xl font-medium text-gray-400 capitalize mb-6">${desc}</div>
-
-                    <!-- Details Section (Wind Speed & Humidity) -->
-                    <div class="flex justify-around text-center border-t pt-4 border-gray-700">
-                        
-                        <!-- Wind Speed -->
-                        <div class="flex flex-col items-center">
-                            <svg class="w-7 h-7 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            <span class="text-sm font-semibold text-gray-400 mt-1">Wind Speed</span>
-                            
-                            <!-- Displaying KM/H -->
-                            <span class="text-xl font-bold ${isWarning ? 'text-red-400' : 'text-sky-300'} mt-0.5">${windKmh} km/h</span>
-
-                            <!-- Displaying Knots -->
-                            <span class="text-sm font-light text-gray-400">(${windKnots} knots)</span>
-                        </div>
-                        
-                        <!-- Humidity (Icon is rotated 180 degrees as previously requested) -->
-                        <div class="flex flex-col items-center">
-                            <svg class="w-7 h-7 text-emerald-500 transform rotate-180" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-                            </svg>
-                            <span class="text-sm font-semibold text-gray-400 mt-1">Humidity</span>
-                            <span class="text-xl font-bold text-emerald-300 mt-0.5">${humidity}%</span>
-                        </div>
-                    </div>
-
-                    <!-- 3-DAY FORECAST SECTION -->
-                    <div class="mt-6 pt-4 border-t border-gray-700">
-                        <h3 class="text-lg font-semibold text-sky-400 mb-3">3-Day Sailing Forecast</h3>
-                        <div class="flex justify-between space-x-2 text-center">
-                            ${forecast.map(day => `
-                                <div class="flex-1 p-2 rounded-lg bg-gray-900/50 shadow-inner">
-                                    <div class="text-sm font-semibold text-gray-300">${day.day}</div>
-                                    
-                                    <!-- Weather Icon -->
-                                    <img src="https://openweathermap.org/img/wn/${day.icon}.png" onerror="this.onerror=null;this.src='https://placehold.co/40x40/020617/ffffff?text=Icon'" alt="Forecast Icon" class="w-10 h-10 mx-auto filter drop-shadow">
-                                    
-                                    <!-- Avg Temp -->
-                                    <div class="text-lg font-bold text-sky-200 mt-1">${day.avgTemp}°C</div>
-                                    
-                                    <!-- Avg Wind Speed (knots) -->
-                                    <div class="text-xs text-gray-400 mt-1">
-                                        ${day.avgWindKnots} knots
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Function to handle showing the error state for a specific card (Dark theme version)
-        function createErrorCardHtml(name, message) {
-            return `
-                <div class="p-6 bg-red-900/30 rounded-xl border-4 border-red-700 shadow-xl text-center frosted-panel">
-                    <h2 class="text-2xl font-bold text-red-300 mb-2">${name}</h2>
-                    <p class="text-sm text-red-400">${message || "Error loading data."}</p>
-                    <p class="text-xs text-red-500 mt-2">Verify API key or network connection.</p>
-                </div>
-            `;
-        }
-
-        // Fetches data for a single location and returns the processed data object (no HTML)
-        async function getWeather(location) {
-            if (apiKey.length < 5) {
-                return {
-                    error: true,
-                    name: location.name,
-                    message: "API Key is missing or invalid."
-                };
-            }
-
-            // 1. Current Weather API Call (For real-time data)
-            const currentApiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${location.lat}&lon=${location.lon}&units=metric&appid=${apiKey}`;
-            // 2. Forecast API Call (For 3-day data, 3-hourly intervals)
-            const forecastApiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${location.lat}&lon=${location.lon}&units=metric&appid=${apiKey}`;
-
-            try {
-                // Fetch both concurrently
-                const [currentResponse, forecastResponse] = await Promise.all([
-                    exponentialBackoffFetch(currentApiUrl),
-                    exponentialBackoffFetch(forecastApiUrl)
-                ]);
-
-                const currentData = await currentResponse.json();
-                const forecastData = await forecastResponse.json();
-
-                if (currentResponse.status !== 200 || forecastResponse.status !== 200) {
-                    console.error(`API Error for ${location.name}. Current Status: ${currentResponse.status}. Forecast Status: ${forecastResponse.status}`);
-                    return {
-                        error: true,
-                        name: location.name,
-                        message: `API error (status: ${currentResponse.status}/${forecastResponse.status}).`
-                    };
-                }
-
-                // 1. Process Current Data
-                const windKmh = (currentData.wind.speed * 3.6).toFixed(1); // m/s to km/h
-                // Conversion: knots = km/h / 1.852
-                const windKnots = (parseFloat(windKmh) / 1.852).toFixed(1);
-
-                // 2. Process Forecast Data
-                const threeDayForecast = processDailyForecast(forecastData.list);
-
-                // 3. Prepare Data Structure (Success)
-                return {
-                    name: location.name,
-                    temp: Math.round(currentData.main.temp),
-                    desc: currentData.weather[0].description,
-                    icon: currentData.weather[0].icon,
-                    windKmh: windKmh,
-                    windKnots: windKnots,
-                    humidity: currentData.main.humidity,
-                    forecast: threeDayForecast // New forecast data array
-                };
-            } catch (error) {
-                console.error(`Fetch failed for ${location.name}:`, error);
-                return {
-                    error: true,
-                    name: location.name,
-                    message: "Network or API service failed after retries."
-                };
-            }
-        }
-
-        // Main function to load all weather data concurrently
-        async function loadAllWeather() {
-            // 1. Clear previous content and display loading state
-            container.innerHTML = getLoadingHtml('Refreshing real-time data...');
-
-            // Wait for all weather fetch calls to complete (returns data objects now)
-            const cardPromises = locations.map(location => getWeather(location));
-            const cardDataResults = await Promise.all(cardPromises);
-
-            const dangerMarinas = []; // Array to collect names of marinas in danger (where wind >= 14 knots)
-            const renderedCards = [];
-
-            for (const result of cardDataResults) {
-                if (result.error) {
-                    // Result is an error object: render error HTML
-                    renderedCards.push(createErrorCardHtml(result.name, result.message));
-                } else {
-                    // Check danger condition (>= 14 knots)
-                    if (parseFloat(result.windKnots) >= 14) {
-                        dangerMarinas.push({
-                            name: result.name,
-                            wind: result.windKnots
-                        });
-                    }
-                    renderedCards.push(createCardHtml(result));
-                }
-            }
-
-            // 2. Inject all the generated HTML cards, replacing the loading message
-            container.innerHTML = renderedCards.join('');
-
-            // 3. Update the static alerts section
-            const alertsListElement = document.getElementById('danger-alerts-list');
-            const alertsStatusElement = document.getElementById('alerts-status');
-
-            if (dangerMarinas.length > 0) {
-                alertsStatusElement.innerHTML = `
-                    <span class="text-red-300 font-semibold">
-                        ${dangerMarinas.length} critical wind alert(s) detected. DO NOT SAIL!
-                    </span>
-                `;
-                // Generate individual alert items for the list
-                alertsListElement.innerHTML = dangerMarinas.map(d => `
-                    <div class="p-3 bg-red-900/40 rounded-lg border border-red-700 animate-border-pulse transition duration-300 hover:bg-red-800/50">
-                        <p class="text-lg font-bold text-red-300">${d.name}</p>
-                        <p class="text-sm text-red-400">Wind Speed: ${d.wind} knots</p>
-                    </div>
-                `).join('');
-            } else {
-                alertsStatusElement.textContent = "No immediate danger alerts (≥ 14 knots). Conditions are currently safe for sailing.";
-                alertsListElement.innerHTML = `
-                     <div class="p-3 bg-sky-900/40 rounded-lg border border-sky-700 text-center">
-                         <p class="text-md font-semibold text-sky-300">All Clear</p>
-                         <p class="text-sm text-gray-400">Continue monitoring for changes.</p>
-                     </div>
-                `;
-            }
-        }
-
-        // Initialize on load and then refresh every 10 seconds
-        window.onload = () => {
-            loadAllWeather();
-            // Auto-refresh the weather data every 10 seconds (10000ms)
-            setInterval(loadAllWeather, 10000);
-        };
-    </script>
-    <br><br><b><br><br>
-    <script type="text/javascript">
-        // Map appearance
-        var width = "80%";         // width in pixels or percentage
-        var height = "1000";         // height in pixels
-        var width = "2000";
-        var latitude = "24.446736";      // center latitude (decimal degrees)
-        var longitude = "54.394089";     // center longitude (decimal degrees)
-        var zoom = "8";             // initial zoom (between 3 and 18)
-        var names = true;          // always show ship names (defaults to false)
-        
-    </script>
-    <script type="text/javascript" src="https://www.vesselfinder.com/aismap.js"></script>
+      html2pdf().set(opt).from(element).save();
+    }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
 
 </html>
