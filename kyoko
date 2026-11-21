@@ -1,0 +1,449 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kyoko Lucky Spin</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Outfit:wght@400;600;800&display=swap">
+<style>
+/* Layout: one-screen spin station — title, big wheel, spin button, prize pop-up. Single committed look: white + Kyoko yellow. */
+:root{
+  --ink:#1d1a10;
+  --paper:#ffffff;
+  --ink-2:#fffdf3;
+  --yolk:#ffd21f;
+  --yolk-deep:#f2b705;
+  --cream:#fff8dc;
+  --muted:#857a52;
+  --display:"Dela Gothic One","Arial Black",Impact,sans-serif;
+  --body:"Outfit",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--body);
+  overflow-x:hidden;
+}
+.stage{
+  min-height:100%;
+  box-sizing:border-box;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3vh,28px);
+  padding-block:clamp(16px,4vh,40px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  background:
+    repeating-linear-gradient(135deg,transparent 0 22px,rgba(255,210,31,.12) 22px 44px),
+    var(--paper);
+}
+header{text-align:center;display:flex;flex-direction:column;gap:6px}
+.eyebrow{
+  font-weight:800;font-size:.78rem;letter-spacing:.28em;text-transform:uppercase;color:var(--yolk-deep);
+}
+h1{
+  margin:0;font-family:var(--display);font-weight:400;
+  font-size:clamp(2rem,7vw,3.6rem);line-height:1;letter-spacing:.01em;color:var(--ink);
+  text-wrap:balance;
+}
+h1 span{color:var(--yolk);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill}
+.sub{margin:0;color:var(--muted);font-size:1rem}
+
+.wheel-wrap{
+  position:relative;
+  width:min(92vw,62vh,560px);
+  aspect-ratio:1;max-width:100%;
+}
+.rim{
+  position:absolute;inset:0;border-radius:50%;
+  background:var(--yolk);
+  box-shadow:0 0 0 6px var(--paper),0 0 0 10px var(--yolk-deep),0 24px 60px rgba(180,140,0,.28);
+}
+canvas#wheel{position:absolute;inset:3.2%;width:93.6%;height:93.6%;border-radius:50%}
+.bulbs{position:absolute;inset:0;pointer-events:none}
+.bulb{
+  position:absolute;width:2.1%;aspect-ratio:1;border-radius:50%;
+  background:var(--yolk-deep);transform:translate(-50%,-50%);
+}
+.bulb.on{background:var(--paper);box-shadow:0 0 8px 2px rgba(255,255,255,.9)}
+
+.pointer{
+  position:absolute;left:50%;top:-4.5%;transform:translateX(-50%);
+  width:12%;aspect-ratio:.8;z-index:3;
+  filter:drop-shadow(0 4px 6px rgba(120,90,0,.35));
+}
+.pointer.tick{animation:tick .09s ease-out}
+@keyframes tick{50%{transform:translateX(-50%) rotate(-12deg)}}
+
+.hub{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:24%;aspect-ratio:1;border-radius:50%;z-index:2;
+  border:0;cursor:pointer;
+  background:var(--paper);color:var(--ink);
+  box-shadow:0 0 0 5px var(--yolk),0 0 0 9px var(--paper),0 8px 18px rgba(120,90,0,.3);
+  font-family:var(--display);font-size:clamp(.95rem,3.4vw,1.5rem);letter-spacing:.04em;
+  transition:transform .15s ease,background .15s ease;
+}
+.hub:hover:not(:disabled){transform:translate(-50%,-50%) scale(1.05)}
+.hub:active:not(:disabled){transform:translate(-50%,-50%) scale(.96)}
+.hub:disabled{cursor:default;color:var(--muted)}
+.hub:focus-visible,.btn:focus-visible,.icon-btn:focus-visible{outline:3px solid var(--ink);outline-offset:4px}
+
+.controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}
+.btn{
+  font-family:var(--display);font-size:1.15rem;letter-spacing:.04em;
+  padding:16px 44px;border-radius:999px;border:3px solid var(--paper);
+  background:var(--yolk);color:var(--ink);cursor:pointer;
+  box-shadow:0 6px 0 var(--yolk-deep),0 10px 24px rgba(180,140,0,.3);
+  transition:transform .1s ease,box-shadow .1s ease;
+}
+.btn:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 var(--yolk-deep)}
+.btn:disabled{opacity:.5;cursor:default}
+.icon-btn{
+  font-family:var(--body);font-weight:600;font-size:.9rem;
+  padding:10px 16px;border-radius:999px;cursor:pointer;
+  background:var(--paper);color:var(--ink);border:1.5px solid var(--yolk-deep);
+}
+.icon-btn[aria-pressed="false"]{color:var(--muted)}
+
+.foot{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-align:center}
+.foot b{color:var(--ink);font-weight:600}
+
+/* Prize pop-up */
+.overlay{
+  position:fixed;inset:0;z-index:20;display:grid;place-items:center;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  background:rgba(255,255,255,.8);backdrop-filter:blur(4px);
+}
+.card{
+  position:relative;width:min(420px,100%);box-sizing:border-box;
+  background:var(--yolk);color:var(--ink);border-radius:28px;
+  padding:34px 26px 26px;text-align:center;
+  border:4px solid var(--paper);
+  box-shadow:0 0 0 4px var(--yolk-deep),0 30px 80px rgba(180,140,0,.3);
+  animation:pop .45s cubic-bezier(.2,1.4,.4,1);
+}
+.card.lose{background:var(--paper);color:var(--ink)}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.card .tag{font-weight:800;font-size:.78rem;letter-spacing:.26em;text-transform:uppercase}
+.card h2{margin:10px 0 8px;font-family:var(--display);font-weight:400;font-size:clamp(1.8rem,8vw,2.5rem);line-height:1.05;text-wrap:balance}
+.card p{margin:0 0 22px;font-size:1rem;line-height:1.45}
+.card .btn{background:var(--paper);color:var(--ink);border-color:var(--paper);box-shadow:0 6px 0 var(--yolk-deep)}
+.card.lose .btn{background:var(--yolk);color:var(--ink);box-shadow:0 6px 0 var(--yolk-deep)}
+.code{
+  display:inline-block;margin:0 0 20px;padding:8px 14px;border-radius:10px;
+  border:2px dashed currentColor;font-weight:800;letter-spacing:.12em;font-variant-numeric:tabular-nums;
+}
+canvas#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:30}
+
+@media (prefers-reduced-motion:reduce){
+  .card{animation:none}
+  .pointer.tick{animation:none}
+}
+</style>
+
+<div class="stage">
+  <header>
+    <div class="eyebrow">Kyoko · Lucky Spin</div>
+    <h1>Spin the <span>Kyoko</span> Wheel</h1>
+    <p class="sub">Tap spin and see what Kyoko has for you today.</p>
+  </header>
+
+  <div class="wheel-wrap" id="wrap">
+    <div class="rim"></div>
+    <div class="bulbs" id="bulbs"></div>
+    <canvas id="wheel" aria-label="Prize wheel with six prizes"></canvas>
+    <svg class="pointer" id="pointer" viewBox="0 0 40 50" aria-hidden="true">
+      <path d="M20 48 L3 10 A18 18 0 0 1 37 10 Z" fill="#f2b705" stroke="#ffffff" stroke-width="3" stroke-linejoin="round"/>
+      <circle cx="20" cy="14" r="5" fill="#ffffff"/>
+    </svg>
+    <button class="hub" id="hub" type="button">SPIN</button>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="spinBtn" type="button">Spin the wheel</button>
+    <button class="icon-btn" id="soundBtn" type="button" aria-pressed="true">Sound on</button>
+  </div>
+
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="card" id="card" role="dialog" aria-modal="true" aria-labelledby="prizeTitle">
+    <div class="tag" id="prizeTag">You won</div>
+    <h2 id="prizeTitle">Free Tahini Latte</h2>
+    <p id="prizeText">Show this screen to the Kyoko team to claim it.</p>
+    <div class="code" id="prizeCode">KY-0000</div><br>
+    <button class="btn" id="closeBtn" type="button">Spin again</button>
+  </div>
+</div>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+(() => {
+  const PRIZES = [
+    { label: ["Try again", "next time"], title: "Try again next time", win: false,
+      text: "So close. Come back on your next visit and spin again." },
+    { label: ["Free", "Tahini Latte"], title: "Free Tahini Latte", win: true,
+      text: "Creamy, nutty and on the house. Show this screen to the Kyoko team." },
+    { label: ["Free Mango", "Sticky Rice"], title: "Free Mango Sticky Rice", win: true,
+      text: "Sweet mango, warm coconut rice. Show this screen to the Kyoko team." },
+    { label: ["Free", "Ice Cream"], title: "Free Ice Cream", win: true,
+      text: "A cold treat on us. Show this screen to the Kyoko team." },
+    { label: ["Mirroring", "Effect"], title: "Mirroring Effect", win: true,
+      text: "You unlocked the Kyoko mirroring effect. Show this screen to the team." },
+    { label: ["15%", "Discount"], title: "15% Discount", win: true,
+      text: "Off your bill today. Show this screen to the Kyoko team before you pay." },
+  ];
+
+  const YOLK = "#ffd21f", INK = "#1d1a10", WHITE = "#ffffff", GOLD = "#f2b705";
+  const N = PRIZES.length, SEG = (Math.PI * 2) / N;
+
+  const canvas = document.getElementById("wheel");
+  const ctx = canvas.getContext("2d");
+  const wrap = document.getElementById("wrap");
+  const hub = document.getElementById("hub");
+  const spinBtn = document.getElementById("spinBtn");
+  const soundBtn = document.getElementById("soundBtn");
+  const pointer = document.getElementById("pointer");
+  const overlay = document.getElementById("overlay");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let rotation = 0, spinning = false, size = 0, soundOn = true, audio = null;
+
+  /* ---------- Wheel drawing ---------- */
+  function resize() {
+    const r = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 3);
+    size = r.width;
+    canvas.width = Math.round(r.width * dpr);
+    canvas.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+    placeBulbs();
+  }
+
+  function draw() {
+    const c = size / 2, R = c;
+    ctx.clearRect(0, 0, size, size);
+    ctx.save();
+    ctx.translate(c, c);
+    ctx.rotate(rotation);
+    for (let i = 0; i < N; i++) {
+      const a0 = -Math.PI / 2 + i * SEG - SEG / 2;
+      const a1 = a0 + SEG;
+      const dark = i % 2 === 0;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, R, a0, a1);
+      ctx.closePath();
+      ctx.fillStyle = dark ? WHITE : YOLK;
+      ctx.fill();
+      ctx.lineWidth = Math.max(2, size * 0.006);
+      ctx.strokeStyle = GOLD;
+      ctx.stroke();
+
+      // label
+      ctx.save();
+      ctx.rotate(a0 + SEG / 2);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = INK;
+      const lines = PRIZES[i].label;
+      const fs = Math.max(11, size * 0.05);
+      ctx.font = `400 ${fs}px "Dela Gothic One", "Arial Black", sans-serif`;
+      const rText = R * 0.63;
+      ctx.translate(rText, 0);
+      ctx.rotate(Math.PI / 2);
+      const lh = fs * 1.15;
+      lines.forEach((ln, k) => {
+        const y = (k - (lines.length - 1) / 2) * lh;
+        let s = fs;
+        while (ctx.measureText(ln).width > R * 0.62 && s > 9) {
+          s -= 1;
+          ctx.font = `400 ${s}px "Dela Gothic One", "Arial Black", sans-serif`;
+        }
+        ctx.fillText(ln, 0, y);
+        ctx.font = `400 ${fs}px "Dela Gothic One", "Arial Black", sans-serif`;
+      });
+      ctx.restore();
+
+      // small dot near the rim
+      ctx.save();
+      ctx.rotate(a0 + SEG / 2);
+      ctx.beginPath();
+      ctx.arc(R * 0.9, 0, size * 0.012, 0, Math.PI * 2);
+      ctx.fillStyle = dark ? YOLK : WHITE;
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  /* ---------- Rim bulbs ---------- */
+  const BULBS = 24;
+  const bulbsEl = document.getElementById("bulbs");
+  for (let i = 0; i < BULBS; i++) {
+    const b = document.createElement("span");
+    b.className = "bulb";
+    bulbsEl.appendChild(b);
+  }
+  function placeBulbs() {
+    [...bulbsEl.children].forEach((b, i) => {
+      const a = (i / BULBS) * Math.PI * 2;
+      b.style.left = 50 + Math.cos(a) * 48.4 + "%";
+      b.style.top = 50 + Math.sin(a) * 48.4 + "%";
+    });
+  }
+  let bulbPhase = 0;
+  setInterval(() => {
+    bulbPhase++;
+    [...bulbsEl.children].forEach((b, i) => {
+      b.classList.toggle("on", spinning ? (i + bulbPhase) % 3 === 0 : (i + bulbPhase) % 2 === 0);
+    });
+  }, 260);
+
+  /* ---------- Sound ---------- */
+  function ensureAudio() {
+    if (!audio) {
+      try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { audio = null; }
+    }
+    if (audio && audio.state === "suspended") audio.resume().catch(() => {});
+  }
+  function beep(freq, dur, type = "square", vol = 0.05) {
+    if (!soundOn || !audio) return;
+    const o = audio.createOscillator(), g = audio.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, audio.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + dur);
+    o.connect(g).connect(audio.destination);
+    o.start(); o.stop(audio.currentTime + dur);
+  }
+  function fanfare(win) {
+    const notes = win ? [523, 659, 784, 1047] : [392, 330];
+    notes.forEach((f, i) => setTimeout(() => beep(f, 0.18, "triangle", 0.08), i * 120));
+  }
+  soundBtn.addEventListener("click", () => {
+    soundOn = !soundOn;
+    soundBtn.setAttribute("aria-pressed", String(soundOn));
+    soundBtn.textContent = soundOn ? "Sound on" : "Sound off";
+  });
+
+  /* ---------- Spin ---------- */
+  function indexAt(rot) {
+    const t = ((-rot % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+    return Math.floor((t + SEG / 2) / SEG) % N;
+  }
+
+  function spin() {
+    if (spinning) return;
+    ensureAudio();
+    spinning = true;
+    hub.disabled = spinBtn.disabled = true;
+
+    const target = Math.floor(Math.random() * N);
+    const jitter = (Math.random() - 0.5) * SEG * 0.7;
+    const current = rotation;
+    // final angle so that segment `target` sits under the pointer
+    let final = -(target * SEG + jitter);
+    const turns = reduce ? 1 : 6 + Math.floor(Math.random() * 3);
+    while (final < current + turns * Math.PI * 2) final += Math.PI * 2;
+
+    const duration = reduce ? 900 : 5200 + Math.random() * 800;
+    const start = performance.now();
+    let lastIdx = indexAt(current);
+    const ease = t => 1 - Math.pow(1 - t, 4);
+
+    function frame(now) {
+      const t = Math.min(1, (now - start) / duration);
+      rotation = current + (final - current) * ease(t);
+      draw();
+      const idx = indexAt(rotation);
+      if (idx !== lastIdx) {
+        lastIdx = idx;
+        beep(900, 0.03, "square", 0.04);
+        pointer.classList.remove("tick");
+        void pointer.getBoundingClientRect();
+        pointer.classList.add("tick");
+      }
+      if (t < 1) requestAnimationFrame(frame);
+      else finish(indexAt(rotation));
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function finish(i) {
+    const p = PRIZES[i];
+    spinning = false;
+    rotation = rotation % (Math.PI * 2);
+    const card = document.getElementById("card");
+    card.classList.toggle("lose", !p.win);
+    document.getElementById("prizeTag").textContent = p.win ? "You won" : "Not this time";
+    document.getElementById("prizeTitle").textContent = p.title;
+    document.getElementById("prizeText").textContent = p.text;
+    const code = document.getElementById("prizeCode");
+    code.hidden = !p.win;
+    code.textContent = "KY-" + Math.random().toString(36).slice(2, 6).toUpperCase();
+    document.getElementById("closeBtn").textContent = p.win ? "Done" : "Spin again";
+    setTimeout(() => {
+      overlay.hidden = false;
+      document.getElementById("closeBtn").focus();
+      fanfare(p.win);
+      if (p.win && !reduce) confetti();
+    }, 350);
+  }
+
+  function closeCard() {
+    overlay.hidden = true;
+    hub.disabled = spinBtn.disabled = false;
+    spinBtn.focus();
+  }
+
+  hub.addEventListener("click", spin);
+  spinBtn.addEventListener("click", spin);
+  document.getElementById("closeBtn").addEventListener("click", closeCard);
+  overlay.addEventListener("click", e => { if (e.target === overlay) closeCard(); });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && !overlay.hidden) closeCard();
+  });
+
+  /* ---------- Confetti ---------- */
+  const cf = document.getElementById("confetti");
+  const cctx = cf.getContext("2d");
+  function confetti() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cf.width = innerWidth * dpr; cf.height = innerHeight * dpr;
+    cctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const colors = [YOLK, GOLD, "#ffe680", "#e0a100"];
+    const parts = Array.from({ length: 160 }, () => ({
+      x: innerWidth / 2 + (Math.random() - 0.5) * 120,
+      y: innerHeight * 0.45,
+      vx: (Math.random() - 0.5) * 14,
+      vy: -Math.random() * 14 - 4,
+      s: 5 + Math.random() * 7,
+      r: Math.random() * Math.PI,
+      vr: (Math.random() - 0.5) * 0.3,
+      c: colors[(Math.random() * colors.length) | 0],
+    }));
+    const t0 = performance.now();
+    (function step(now) {
+      cctx.clearRect(0, 0, innerWidth, innerHeight);
+      parts.forEach(p => {
+        p.vy += 0.35; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+        cctx.save(); cctx.translate(p.x, p.y); cctx.rotate(p.r);
+        cctx.fillStyle = p.c; cctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2);
+        cctx.restore();
+      });
+      if (now - t0 < 3200) requestAnimationFrame(step);
+      else cctx.clearRect(0, 0, innerWidth, innerHeight);
+    })(t0);
+  }
+
+  /* ---------- Boot ---------- */
+  new ResizeObserver(resize).observe(wrap);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+  resize();
+})();
+</script>
+
+</body></html>
