@@ -105,6 +105,27 @@ canvas#wheel{position:absolute;inset:3.2%;width:93.6%;height:93.6%;border-radius
 }
 .icon-btn[aria-pressed="false"]{color:var(--muted)}
 
+/* Top-left full-screen toggle button */
+.fs-btn{
+  position:fixed;
+  top:max(14px,env(safe-area-inset-top,0px));
+  left:max(14px,env(safe-area-inset-left,0px));
+  z-index:15;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  box-shadow:0 4px 12px rgba(180,140,0,.15);
+  transition:transform .12s ease,background .15s ease;
+}
+.fs-btn:hover{background:var(--cream)}
+.fs-btn:active{transform:scale(.96)}
+.fs-btn[aria-pressed="false"]{color:var(--ink)}
+.fs-btn svg{width:16px;height:16px;flex-shrink:0}
+@media (max-width:480px){
+  .fs-btn{padding:10px 12px}
+  .fs-btn .fs-label{display:none}
+}
+
 .foot{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-align:center}
 .foot b{color:var(--ink);font-weight:600}
 
@@ -141,6 +162,17 @@ canvas#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:non
   .pointer.tick{animation:none}
 }
 </style>
+
+<!-- Full-screen toggle button in top-left corner -->
+<button class="icon-btn fs-btn" id="fsBtn" type="button" aria-pressed="false" aria-label="Enter full screen">
+  <svg id="fsIconExpand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+  </svg>
+  <svg id="fsIconCompress" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden>
+    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+  </svg>
+  <span class="fs-label" id="fsLabel">Full screen</span>
+</button>
 
 <div class="stage">
   <header>
@@ -205,11 +237,75 @@ canvas#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:non
   const hub = document.getElementById("hub");
   const spinBtn = document.getElementById("spinBtn");
   const soundBtn = document.getElementById("soundBtn");
+  const fsBtn = document.getElementById("fsBtn");
+  const fsLabel = document.getElementById("fsLabel");
+  const fsIconExpand = document.getElementById("fsIconExpand");
+  const fsIconCompress = document.getElementById("fsIconCompress");
   const pointer = document.getElementById("pointer");
   const overlay = document.getElementById("overlay");
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   let rotation = 0, spinning = false, size = 0, soundOn = true, audio = null;
+
+  /* ---------- Fullscreen toggle ---------- */
+  function isFullScreen() {
+    return Boolean(
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.msFullscreenElement
+    );
+  }
+
+  function updateFsButton() {
+    const active = isFullScreen();
+    fsBtn.setAttribute("aria-pressed", String(active));
+    fsBtn.setAttribute("aria-label", active ? "Exit full screen" : "Enter full screen");
+    fsLabel.textContent = active ? "Exit full screen" : "Full screen";
+    fsIconExpand.hidden = active;
+    fsIconCompress.hidden = !active;
+  }
+
+  async function toggleFullScreen() {
+    try {
+      if (!isFullScreen()) {
+        const el = document.documentElement;
+        if (el.requestFullscreen) {
+          await el.requestFullscreen();
+        } else if (el.webkitRequestFullscreen) {
+          el.webkitRequestFullscreen();
+        } else if (el.msRequestFullscreen) {
+          el.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      }
+    } catch (err) {
+      // Gracefully ignore if browser or iframe policy blocks fullscreen
+    }
+  }
+
+  // Hide button if Fullscreen API is completely unsupported
+  const fsSupported = Boolean(
+    document.fullscreenEnabled ||
+    document.webkitFullscreenEnabled ||
+    document.msFullscreenEnabled ||
+    document.documentElement.requestFullscreen ||
+    document.documentElement.webkitRequestFullscreen
+  );
+  if (!fsSupported) {
+    fsBtn.hidden = true;
+  } else {
+    fsBtn.addEventListener("click", toggleFullScreen);
+    document.addEventListener("fullscreenchange", updateFsButton);
+    document.addEventListener("webkitfullscreenchange", updateFsButton);
+    document.addEventListener("msfullscreenchange", updateFsButton);
+  }
 
   /* ---------- Wheel drawing ---------- */
   function resize() {
